@@ -4,7 +4,7 @@ github:              "EarnestResearch/aws-lambda-haskell-runtime"
 license:             Apache-2.0
 author:              "Louis Vera"
 maintainer:          "lvera@earnestresearch.com"
-copyright:           "Earnest Research 2018"
+copyright:           "Earnest Research 2019"
 
 extra-source-files:
 - README.md
