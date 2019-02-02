@@ -63,7 +63,7 @@ runtimeClient :: (FromJSON e, ToJSON r, MonadLogger m, MonadIO m) => m (RuntimeC
 runtimeClient = do
   let
     runtimeHostEnv = "AWS_LAMBDA_RUNTIME_API"
-    errorMsg = "The \'AWS_LAMBDA_RUNTIME_API\' environment variable is required and should contain an ip address and port."
+    errorMsg = "Missing required environment variable \'AWS_LAMBDA_RUNTIME_API\'."
   runtimeHost <- liftIO $ lookupEnv runtimeHostEnv
   session     <- liftIO S.newAPISession
   unless (isJust runtimeHost) ($(logErrorSH) errorMsg)
@@ -107,7 +107,7 @@ setTraceID response = do
   let
     traceEnv = "_X_AMZN_TRACE_ID"
     traceID  = fmap B.unpack $ response ^? responseHeader "Lambda-Runtime-Trace-Id"
-    errorMsg = "Missing response header \"Lambda-Runtime-Trace-Id\""
+    errorMsg = "Missing response header \"Lambda-Runtime-Trace-Id\"."
   unless (isJust traceID) ($(logError) errorMsg)
   case traceID of
     Just traceID' -> liftIO $ setEnv traceEnv traceID'
@@ -117,7 +117,7 @@ parseEventID :: (MonadIO m, MonadLogger m) => Response ByteString -> m EventID
 parseEventID response = do
   let
     header   = "Lambda-Runtime-Aws-Request-Id"
-    errorMsg = "The response header \"Lambda-Runtime-Aws-Request-Id\" is required, but missing."
+    errorMsg = "Missing required response header \"Lambda-Runtime-Aws-Request-Id\"."
     eventID  = fmap (EventID . B.unpack) (response ^? responseHeader header)
   unless (isJust eventID) ($(logErrorSH) errorMsg)
   pure $ forceMaybe errorMsg eventID
