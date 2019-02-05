@@ -1,6 +1,6 @@
-name:                aws-lambda-haskell-runtime
+name:                aws-lambda-haskell-runtime-client
 version:             0.1.0.0
-github:              "EarnestResearch/aws-lambda-haskell-runtime"
+github:              "EarnestResearch/aws-lambda-haskell-runtime-client"
 license:             Apache-2.0
 author:              "Louis Vera"
 maintainer:          "lvera@earnestresearch.com"
@@ -17,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/EarnestResearch/aws-lambda-haskell-runtime#readme>
+description:         Please see the README on GitHub at <https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme>
 
 dependencies:
 - aeson
@@ -35,7 +35,7 @@ library:
   source-dirs: src
 
 executables:
-  aws-lambda-haskell-runtime-exe:
+  aws-lambda-haskell-runtime-client-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -43,10 +43,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - aws-lambda-haskell-runtime
+    - aws-lambda-haskell-runtime-client
 
 tests:
-  aws-lambda-haskell-runtime-test:
+  aws-lambda-haskell-runtime-client-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -54,4 +54,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - aws-lambda-haskell-runtime
+    - aws-lambda-haskell-runtime-client

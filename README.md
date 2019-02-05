@@ -1,9 +1,10 @@
-# aws-lambda-haskell-runtime
+# aws-lambda-haskell-runtime-client
 
-A custom runtime for AWS Lamda written in Haskell.
+A custom runtime client for AWS Lamda written in Haskell.
 
-The main function shows an example of a lambda that can be used as a lambda
-proxy by API Gateway. It simply echos back whatever it receives.
+The main function is an example of how to use the runtime client to produce an
+executable that can be used as a lambda proxy by API Gateway. It simply echos
+back whatever it receives.
 
 ## Prerequisites ##
 

@@ -20,5 +20,5 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
-aws-lambda-haskell-runtime.cabal
+aws-lambda-haskell-runtime-client.cabal
 *~
