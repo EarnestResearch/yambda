@@ -32,3 +32,4 @@ data APIGatewayInputEvent =
   )
 
 instance FromJSON APIGatewayInputEvent
+

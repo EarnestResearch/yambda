@@ -140,3 +140,4 @@ postError' Endpoints{..} session (EventID eventID) error' = do
     error''  = encode error'
   liftIO $ S.post session errorURL error''
   return ()
+

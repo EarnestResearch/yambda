@@ -24,3 +24,4 @@ echo RuntimeClient{..} = do
   case eventBody of
     Right (APIGatewayInputEvent{..}) -> postResponse eventID $ apiGatewayOutputEvent body
     Left(e) -> postError eventID $ Error "Unexpected Error" $ pack e
+
