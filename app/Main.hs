@@ -1,5 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
@@ -22,5 +23,4 @@ echo RuntimeClient{..} = do
   Event{..} <- getNextEvent
   case eventBody of
     Right (APIGatewayInputEvent{..}) -> postResponse eventID $ apiGatewayOutputEvent body
-    Left(e) -> postError eventID $ mkError e
-      where mkError = (\x -> Error x x) . pack
+    Left(e) -> postError eventID $ Error "Unexpected Error" $ pack e
