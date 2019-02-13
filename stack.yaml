@@ -1,0 +1,9 @@
+resolver: lts-12.24
+
+packages:
+- .
+
+docker:
+  enable: true
+  repo: aws-lambda-haskell-platform:latest
+  stack-exe: image
