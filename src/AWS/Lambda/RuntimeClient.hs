@@ -57,6 +57,7 @@ data RuntimeClient e r m =
     getNextEvent :: (FromJSON e, MonadIO m, MonadLogger m) => m (Event e)
   , postResponse :: (ToJSON r, MonadIO m, MonadLogger m) => EventID -> r -> m ()
   , postError :: (MonadIO m, MonadLogger m) => EventID -> Error -> m ()
+  , postInitError :: (MonadIO m, MonadLogger m) => Error -> m ()
   }
 
 runtimeClient :: (FromJSON e, ToJSON r, MonadLogger m, MonadIO m) => m (RuntimeClient e r m)
@@ -70,9 +71,10 @@ runtimeClient = do
   let endpoints' = endpoints . (forceMaybe errorMsg) $ runtimeHost
   pure $
     RuntimeClient {
-      getNextEvent = getNextEvent' endpoints' session
-    , postResponse = postResponse' endpoints' session
-    , postError    = postError' endpoints' session
+      getNextEvent  = getNextEvent' endpoints' session
+    , postResponse  = postResponse' endpoints' session
+    , postError     = postError' endpoints' session
+    , postInitError = postInitError' endpoints' session
     } 
     
 data Endpoints =
@@ -137,6 +139,14 @@ postError' :: (MonadIO m, MonadLogger m) => Endpoints -> Session -> EventID -> E
 postError' Endpoints{..} session (EventID eventID) error' = do
   let
     errorURL = baseURL <> "/invocation/" <> eventID <> "/error"
+    error''  = encode error'
+  liftIO $ S.post session errorURL error''
+  return ()
+
+postInitError' :: (MonadIO m, MonadLogger m) => Endpoints -> Session -> Error -> m ()
+postInitError' Endpoints{..} session error' = do
+  let
+    errorURL = baseURL <> "/init/error"
     error''  = encode error'
   liftIO $ S.post session errorURL error''
   return ()
