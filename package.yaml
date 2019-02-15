@@ -1,7 +1,7 @@
 name:                aws-lambda-haskell-runtime-client
 version:             0.1.0.0
 github:              "EarnestResearch/aws-lambda-haskell-runtime-client"
-license:             Apache-2.0
+license:             MIT
 author:              "Louis Vera"
 maintainer:          "lvera@earnestresearch.com"
 copyright:           "Earnest Research 2019"
