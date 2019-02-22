@@ -4,8 +4,7 @@
 
 module Main where
 
-import AWS.Lambda.APIGatewayInputEvent
-import AWS.Lambda.APIGatewayOutputEvent
+import AWS.Lambda.KinesisDataStreamsEvent
 import AWS.Lambda.RuntimeClient
 import Control.Monad
 import Control.Monad.IO.Class
@@ -15,13 +14,13 @@ import Data.Text (Text, pack)
 
 main :: IO ()
 main = runStderrLoggingT $ do
-  client <- runtimeClient @APIGatewayInputEvent @APIGatewayOutputEvent
+  client <- runtimeClient @KinesisDataStreamsEvent @KinesisDataStreamsEvent
   forever $ echo client
 
-echo :: (MonadLogger m, MonadIO m) => RuntimeClient APIGatewayInputEvent APIGatewayOutputEvent m -> m ()
+echo :: (MonadLogger m, MonadIO m) => RuntimeClient KinesisDataStreamsEvent KinesisDataStreamsEvent m -> m ()
 echo RuntimeClient{..} = do
   Event{..} <- getNextEvent
   case eventBody of
-    Right (APIGatewayInputEvent{..}) -> postResponse eventID $ apiGatewayOutputEvent body
-    Left(e) -> postError eventID $ Error "Unexpected Error" $ pack e
+    Right k -> postResponse eventID $ k
+    Left e -> postError eventID $ Error "Unexpected Error" $ pack e
 
