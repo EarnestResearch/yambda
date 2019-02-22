@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module AWS.Lambda.KinesisDataStreamsEvent
   (
@@ -27,7 +28,7 @@ instance FromJSON Kinesis where
     <*> v .: "sequenceNumber"
 
 instance ToJSON Kinesis where
-  toJSON (Kinesis partitionKey payload kinesisSchemaVersion sequenceNumber) =
+  toJSON Kinesis{..} =
     object [
         "partitionKey" .= partitionKey
       , "data" .= payload
@@ -61,5 +62,6 @@ instance FromJSON KinesisDataStreamsEvent where
       <$> ((v .: "Records") >>= parseJSONList)
 
 instance ToJSON KinesisDataStreamsEvent where
-  toJSON (KinesisDataStreamsEvent records) = 
+  toJSON (KinesisDataStreamsEvent{..}) = 
     object ["records" .= records]
+
