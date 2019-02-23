@@ -12,22 +12,22 @@ import Data.Text (Text)
 import Data.HashMap.Strict
 import GHC.Generics
 
-data Kinesis =
+data Kinesis a =
   Kinesis {
     partitionKey :: Text,
-    payload :: Text,
+    payload :: a,
     kinesisSchemaVersion :: Text,
     sequenceNumber :: Text
   } deriving (Show)
 
-instance FromJSON Kinesis where
+instance FromJSON a => FromJSON (Kinesis a) where
   parseJSON (Object v) = Kinesis
     <$> v .: "partitionKey"
     <*> v .: "data"
     <*> v .: "kinesisSchemaVersion"
     <*> v .: "sequenceNumber"
 
-instance ToJSON Kinesis where
+instance ToJSON a => ToJSON (Kinesis a) where
   toJSON Kinesis{..} =
     object [
         "partitionKey" .= partitionKey
@@ -36,11 +36,11 @@ instance ToJSON Kinesis where
       , "sequenceNumber" .= sequenceNumber
     ]
 
-data Record =
+data Record a =
   Record {
     eventID :: Text,
     eventVersion :: Text,
-    kinesis :: Kinesis,
+    kinesis :: Kinesis a,
     invokeIdentityArn :: Text,
     eventName :: Text,
     eventSourceARN :: Text,
@@ -48,20 +48,20 @@ data Record =
     awsRegion :: Text
   } deriving (Show, Generic)
 
-instance FromJSON Record
-instance ToJSON Record
+instance FromJSON a => FromJSON (Record a)
+instance ToJSON a => ToJSON (Record a)
 
-data KinesisDataStreamsEvent = 
+data KinesisDataStreamsEvent a = 
   KinesisDataStreamsEvent { 
-    records :: [Record] 
+    records :: [Record a] 
   }
 
-instance FromJSON KinesisDataStreamsEvent where
+instance FromJSON a => FromJSON (KinesisDataStreamsEvent a) where
   parseJSON = withObject "KinesisDataStreamsEvent" $ 
     \v -> KinesisDataStreamsEvent 
       <$> ((v .: "Records") >>= parseJSONList)
 
-instance ToJSON KinesisDataStreamsEvent where
+instance ToJSON a => ToJSON (KinesisDataStreamsEvent a) where
   toJSON (KinesisDataStreamsEvent{..}) = 
     object ["records" .= records]
 

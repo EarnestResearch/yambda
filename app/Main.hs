@@ -14,13 +14,14 @@ import Control.Monad.IO.Class
 import Control.Monad.Logger
 import Control.Monad.Trans.Class
 import Data.Text (Text, pack)
+import Data.Aeson hiding (Error)
 
 main :: IO ()
 main = runStderrLoggingT $ do
   client <- runtimeClient
   forever $ echo client
 
-echo :: (MonadLogger m, MonadIO m) => RuntimeClient I.InvocationEvent O.OutputEvent m -> m ()
+echo :: (MonadLogger m, MonadIO m) => RuntimeClient (I.InvocationEvent Text) (O.OutputEvent Text) m -> m ()
 echo RuntimeClient{..} = do
   Event{..} <- getNextEvent
   case eventBody of

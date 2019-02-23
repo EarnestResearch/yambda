@@ -7,8 +7,8 @@ import AWS.Lambda.KinesisDataStreamsEvent
 import Data.Aeson.TH
 import Control.Applicative
 
-data InvocationEvent =
+data InvocationEvent a =
     APIGateway APIGatewayInputEvent
-  | Kinesis KinesisDataStreamsEvent
+  | Kinesis (KinesisDataStreamsEvent a)
 
 $(deriveJSON defaultOptions{sumEncoding = UntaggedValue} ''InvocationEvent)
