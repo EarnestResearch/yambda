@@ -24,7 +24,7 @@ data APIGatewayOutputEvent =
     Generic
   , Show
   )
-
+instance FromJSON APIGatewayOutputEvent
 instance ToJSON APIGatewayOutputEvent
 
 apiGatewayOutputEvent :: Text -> APIGatewayOutputEvent
