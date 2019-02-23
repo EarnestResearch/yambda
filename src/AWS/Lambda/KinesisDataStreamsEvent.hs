@@ -17,7 +17,7 @@ data Kinesis =
     partitionKey :: Text,
     payload :: Text,
     kinesisSchemaVersion :: Text,
-    sequenceNumber :: Integer
+    sequenceNumber :: Text
   } deriving (Show)
 
 instance FromJSON Kinesis where
