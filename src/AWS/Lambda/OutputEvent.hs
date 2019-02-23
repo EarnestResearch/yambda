@@ -10,4 +10,4 @@ data OutputEvent a =
     APIGateway APIGatewayOutputEvent
   | Kinesis (KinesisDataStreamsEvent a)
 
-$(deriveJSON defaultOptions ''OutputEvent)
+$(deriveJSON defaultOptions{sumEncoding = UntaggedValue} ''OutputEvent)
