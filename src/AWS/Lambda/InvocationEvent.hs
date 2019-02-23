@@ -11,4 +11,4 @@ data InvocationEvent =
     APIGateway APIGatewayInputEvent
   | Kinesis KinesisDataStreamsEvent
 
-$(deriveJSON defaultOptions ''InvocationEvent)
+$(deriveJSON defaultOptions{sumEncoding = UntaggedValue} ''InvocationEvent)
