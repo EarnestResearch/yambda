@@ -27,3 +27,5 @@ docker build --tag=aws-lambda-haskell-platform .
 stack build
 ```
 
+## Creating a function
+Running `make` will create a `function.zip` file that you can upload to lambda.
