@@ -32,4 +32,3 @@ data APIGatewayInputEvent =
   )
 
 instance FromJSON APIGatewayInputEvent
-instance ToJSON APIGatewayInputEvent
