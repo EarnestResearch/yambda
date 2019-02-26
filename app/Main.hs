@@ -12,7 +12,6 @@ import Control.Monad.IO.Class
 import Control.Monad.Logger
 import Control.Monad.Trans.Class
 import Data.Text (Text, pack)
-import Data.Aeson hiding (Error)
 
 main :: IO ()
 main = runStderrLoggingT $ do
