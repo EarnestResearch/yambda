@@ -1,9 +1,9 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE RankNTypes                 #-}
+{-# LANGUAGE RecordWildCards            #-}
+{-# LANGUAGE TemplateHaskell            #-}
 
 module AWS.Lambda.RuntimeClient
   (
@@ -14,28 +14,28 @@ module AWS.Lambda.RuntimeClient
   , EventID
   ) where
 
-import           GHC.Generics
 import           Control.Lens
+import           Control.Monad
+import           Control.Monad.IO.Class
+import           Control.Monad.Logger
+import           Control.Monad.Trans.Class
+import           Data.Aeson hiding (Error)
 import qualified Data.ByteString.Char8 as B
 import           Data.ByteString.Lazy.Internal
+import           Data.Maybe
 import           Data.Text (Text)
 import qualified Data.Text as T
-import           Data.Maybe
-import           Data.Aeson hiding (Error)
-import           Control.Monad
-import           Control.Monad.Logger
-import           Control.Monad.IO.Class
-import           Control.Monad.Trans.Class
-import           System.Environment
+import           GHC.Generics
 import           Network.Wreq
 import           Network.Wreq.Session as S
+import           System.Environment
 
 newtype EventID = EventID String deriving (Show)
 type ErrorMessage = String
 
 data Event a =
   Event {
-    eventID :: EventID
+    eventID   :: EventID
   , eventBody :: Either ErrorMessage a
   } deriving (
     Show
@@ -43,7 +43,7 @@ data Event a =
 
 data Error =
   Error {
-    errorType :: Text
+    errorType    :: Text
   , errorMessage :: Text
   } deriving (
     Show
@@ -75,8 +75,8 @@ runtimeClient = do
     , postResponse  = postResponse' endpoints' session
     , postError     = postError' endpoints' session
     , postInitError = postInitError' endpoints' session
-    } 
-    
+    }
+
 data Endpoints =
   Endpoints {
     baseURL :: String
@@ -113,7 +113,7 @@ setTraceID response = do
   unless (isJust traceID) ($(logError) errorMsg)
   case traceID of
     Just traceID' -> liftIO $ setEnv traceEnv traceID'
-    Nothing -> liftIO $ unsetEnv traceEnv
+    Nothing       -> liftIO $ unsetEnv traceEnv
 
 parseEventID :: (MonadIO m, MonadLogger m) => Response ByteString -> m EventID
 parseEventID response = do
