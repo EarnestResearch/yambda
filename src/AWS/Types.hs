@@ -3,7 +3,7 @@
 
 module AWS.Types where
 
-import Data.Aeson (FromJSON, withText)
+import Data.Aeson (FromJSON, ToJSON, withText)
 import Data.Text
 import GHC.Generics
 
@@ -13,10 +13,8 @@ data ARN = ARN {
   ,service :: Text
   ,region :: Text
   ,accountID :: Text
-  ,apiID :: Text
-  ,stage :: Text
-  ,method :: Text
-  ,resourcePath :: Text } deriving (Show, Generic)
+  ,resource :: Text
+  } deriving (Show, Generic)
     
 instance FromJSON ARN where
 parseJSON = withText "ARN" $ \t ->
@@ -24,11 +22,13 @@ parseJSON = withText "ARN" $ \t ->
     Just arn -> pure arn
     Nothing -> fail . unpack $ t <>
       " doesn't match expected format \
-      \arn:aws:execute-api:<regionId>:<accountId>:<apiId>/<stage>/<method>/<resourcePath>"
+      \arn:aws:<service>:<region>:<accountId>:<resource>"
+
+instance ToJSON ARN where
+toJSON arn = intercalate ":" arn
 
 textToARN :: Text -> Maybe ARN
 textToARN t
-  | (pre : part : svc : reg : accID : res : []) <- splitOn ":" t
-  , (apiID : stg : mthd : path : []) <- splitOn "/" res
-    = Just $ ARN pre part svc reg accID apiID stg mthd path
+  | (pre : part : svc : reg : accID : res) <- splitOn ":" t
+    = Just $ ARN pre part svc reg accID (intercalate ":" res)
   | otherwise = Nothing
