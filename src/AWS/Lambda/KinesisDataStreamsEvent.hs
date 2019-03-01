@@ -11,7 +11,6 @@ import Data.Aeson
 import Data.Text (Text)
 import Data.HashMap.Strict
 import GHC.Generics
-import AWS.Types
 
 data Kinesis a =
   Kinesis {
@@ -44,7 +43,7 @@ data Record a =
     kinesis :: Kinesis a,
     invokeIdentityArn :: Text,
     eventName :: Text,
-    eventSourceARN :: ARN,
+    eventSourceARN :: Text,
     eventSource :: Text,
     awsRegion :: Text
   } deriving (Show, Generic)
