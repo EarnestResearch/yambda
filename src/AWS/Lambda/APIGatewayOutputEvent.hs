@@ -1,6 +1,6 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module AWS.Lambda.APIGatewayOutputEvent
   (
@@ -9,17 +9,17 @@ module AWS.Lambda.APIGatewayOutputEvent
   ) where
 
 import Data.Aeson
-import Data.Text (Text)
 import Data.HashMap.Strict
+import Data.Text (Text)
 import GHC.Generics
 
 data APIGatewayOutputEvent =
   APIGatewayOutputEvent {
-    isBase64Encoded :: Bool
-  , statusCode :: Int
-  , headers :: Maybe (HashMap Text Text)
+    isBase64Encoded   :: Bool
+  , statusCode        :: Int
+  , headers           :: Maybe (HashMap Text Text)
   , multiValueHeaders :: Maybe (HashMap Text [Text])
-  , body :: Text
+  , body              :: Text
   } deriving (
     Generic
   , Show

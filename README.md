@@ -10,6 +10,7 @@ back whatever it receives.
 
 1. [Stack] (https://docs.haskellstack.org/en/stable/install_and_upgrade/)
 1. [Docker] (https://docs.docker.com/docker-for-mac/install/)
+1. [Stylish Haskell] (https://github.com/jaspervdj/stylish-haskell)
 
 ### Building in a Docker Container ###
 

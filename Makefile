@@ -5,3 +5,11 @@ build:
 	cp ${BUILD_DIR}/bin/aws-lambda-haskell-runtime-client-exe bootstrap
 	zip function.zip bootstrap
 	rm bootstrap
+
+stylish:
+	find src -name '*.hs' | xargs stylish-haskell -i
+
+.PHONY:
+	build
+	stylish
+
