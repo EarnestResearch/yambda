@@ -29,4 +29,3 @@ instance ToJSON APIGatewayOutputEvent
 
 apiGatewayOutputEvent :: Text -> APIGatewayOutputEvent
 apiGatewayOutputEvent = APIGatewayOutputEvent False 200 Nothing Nothing
-

@@ -15,7 +15,7 @@ import Data.Text (Text, pack)
 
 main :: IO ()
 main = runStderrLoggingT $ do
-  client <- runtimeClient @APIGatewayInputEvent @APIGatewayOutputEvent
+  client <- runtimeClient
   forever $ echo client
 
 echo :: (MonadLogger m, MonadIO m) => RuntimeClient APIGatewayInputEvent APIGatewayOutputEvent m -> m ()
@@ -23,5 +23,4 @@ echo RuntimeClient{..} = do
   Event{..} <- getNextEvent
   case eventBody of
     Right (APIGatewayInputEvent{..}) -> postResponse eventID $ apiGatewayOutputEvent body
-    Left(e) -> postError eventID $ Error "Unexpected Error" $ pack e
-
+    Left e -> postError eventID $ Error "Unexpected Error" $ pack e
