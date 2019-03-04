@@ -23,6 +23,7 @@ dependencies:
 - transformers
 - unordered-containers
 - wreq
+- safe-exceptions
 
 library:
   source-dirs: src

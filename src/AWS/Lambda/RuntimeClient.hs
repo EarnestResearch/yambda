@@ -14,6 +14,8 @@ module AWS.Lambda.RuntimeClient
   , EventID
   ) where
 
+import           Control.Concurrent
+import           Control.Exception.Safe
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
@@ -60,7 +62,7 @@ data RuntimeClient e r m =
   , postInitError :: (MonadIO m, MonadLogger m) => Error -> m ()
   }
 
-runtimeClient :: (FromJSON e, ToJSON r, MonadLogger m, MonadIO m) => m (RuntimeClient e r m)
+runtimeClient :: (FromJSON e, ToJSON r, MonadLogger m, MonadIO m, MonadCatch m) => m (RuntimeClient e r m)
 runtimeClient = do
   let
     runtimeHostEnv = "AWS_LAMBDA_RUNTIME_API"
@@ -69,9 +71,10 @@ runtimeClient = do
   session     <- liftIO S.newAPISession
   unless (isJust runtimeHost) ($(logErrorSH) errorMsg)
   let endpoints' = endpoints . (forceMaybe errorMsg) $ runtimeHost
+  let nextEvent = retry $ getNextEvent' endpoints' session
   pure $
     RuntimeClient {
-      getNextEvent  = getNextEvent' endpoints' session
+      getNextEvent  = nextEvent
     , postResponse  = postResponse' endpoints' session
     , postError     = postError' endpoints' session
     , postInitError = postInitError' endpoints' session
@@ -151,3 +154,16 @@ postInitError' Endpoints{..} session error' = do
   liftIO $ S.post session errorURL error''
   return ()
 
+retry :: (MonadIO m, MonadCatch m) => m a -> m a
+retry = retryWithExponentialBackoff 3 1 100
+
+retryWithExponentialBackoff :: (MonadIO m, MonadCatch m) => Integer -> Integer -> Int -> m a -> m a
+retryWithExponentialBackoff n attempt backoff action
+  | attempt >= n = action
+  | otherwise = do
+    result <- tryAny action
+    case result of
+      Right(a) -> pure a
+      Left(e) -> do
+        liftIO $ threadDelay (backoff * 2^attempt)
+        retryWithExponentialBackoff n (attempt + 1) backoff action
