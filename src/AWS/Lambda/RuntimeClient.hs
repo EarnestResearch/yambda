@@ -29,6 +29,7 @@ import           GHC.Generics
 import           Network.Wreq
 import           Network.Wreq.Session as S
 import           System.Environment
+import qualified Network.HTTP.Client as C
 
 newtype EventID = EventID String deriving (Show)
 type ErrorMessage = String
@@ -65,8 +66,12 @@ runtimeClient = do
   let
     runtimeHostEnv = "AWS_LAMBDA_RUNTIME_API"
     errorMsg = "Missing required environment variable \'AWS_LAMBDA_RUNTIME_API\'."
+    settings =
+      C.defaultManagerSettings {
+        C.managerResponseTimeout = C.responseTimeoutNone
+      }
   runtimeHost <- liftIO $ lookupEnv runtimeHostEnv
-  session     <- liftIO S.newAPISession
+  session     <- liftIO $ S.newSessionControl Nothing settings
   unless (isJust runtimeHost) ($(logErrorSH) errorMsg)
   let endpoints' = endpoints . (forceMaybe errorMsg) $ runtimeHost
   pure $
