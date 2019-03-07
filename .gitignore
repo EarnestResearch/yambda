@@ -22,4 +22,4 @@ cabal.project.local~
 .ghc.environment.*
 aws-lambda-haskell-runtime-client.cabal
 *~
-function.zip
+!build

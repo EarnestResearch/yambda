@@ -29,9 +29,9 @@ library:
   source-dirs: src
 
 executables:
-  aws-lambda-haskell-runtime-client-exe:
+  api-gateway-exe:
     main:                Main.hs
-    source-dirs:         app
+    source-dirs:         examples/api-gateway
     ghc-options:
     - -threaded
     - -rtsopts

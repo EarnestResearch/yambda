@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  API Gateway Echo
+
+  A simple example of using the runtime client to create an API
+  Gateway endpoint that echos back whatever data you send it.
+Resources:
+  APIGatewayEcho:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: Provided
+      Runtime: Provided
+      CodeUri: '{{ZIP_FILE_PATH}}'
+      Description: >
+        A simple example of using the runtime client to create an API
+        Gateway endpoint that echos back whatever data you send it.
+      Events:
+        Post:
+          Type: Api
+          Properties:
+            Path: /echo
+            Method: post
+
