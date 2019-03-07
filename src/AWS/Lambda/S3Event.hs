@@ -4,7 +4,11 @@
 
 module AWS.Lambda.S3Event
   (
-    S3Event(..)
+    S3Event(..),
+    S3(..),
+    S3Object(..),
+    Bucket(..),
+    Record(..)
   ) where
 
 import Data.Aeson
