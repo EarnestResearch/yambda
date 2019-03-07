@@ -8,6 +8,10 @@ default: stylish package-all sam-template-all
 build:
 	stack build --docker --test --copy-bins --local-bin-path ${BUILD_DIR}
 
+sam-tests:
+	sam local generate-event apigateway aws-proxy | \
+		sam local invoke "APIGatewayEcho" -t build/api-gateway.yaml
+
 .PHONY: package-all
 package-all: build
 	$(foreach EXAMPLE,$(EXAMPLES),NAME=$(EXAMPLE) $(MAKE) package;)
