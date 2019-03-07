@@ -4,7 +4,9 @@
 
 module AWS.Lambda.KinesisDataStreamsEvent
   (
-    KinesisDataStreamsEvent(..)
+    KinesisDataStreamsEvent(..),
+    Record(..),
+    Kinesis(..)
   ) where
 
 import Data.Aeson
