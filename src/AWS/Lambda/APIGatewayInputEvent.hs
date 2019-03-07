@@ -12,7 +12,7 @@ import Data.HashMap.Strict
 import Data.Text (Text)
 import GHC.Generics
 
-data APIGatewayInputEvent =
+data APIGatewayInputEvent a =
   APIGatewayInputEvent {
     resource                        :: Text
   , path                            :: Text
@@ -24,11 +24,11 @@ data APIGatewayInputEvent =
   , pathParameters                  :: Maybe (HashMap Text Text)
   , stageVariables                  :: Maybe (HashMap Text Text)
   , requestContext                  :: HashMap Text Value
-  , body                            :: Text
+  , body                            :: a
   , isBase64Encoded                 :: Bool
   } deriving (
     Generic
   , Show
   )
 
-instance FromJSON APIGatewayInputEvent
+instance FromJSON a => FromJSON (APIGatewayInputEvent a)

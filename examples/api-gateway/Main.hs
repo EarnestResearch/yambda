@@ -18,7 +18,10 @@ main = runStderrLoggingT $ do
   client <- runtimeClient
   forever $ echo client
 
-echo :: (MonadLogger m, MonadIO m) => RuntimeClient APIGatewayInputEvent APIGatewayOutputEvent m -> m ()
+type Runtime a =
+  RuntimeClient (APIGatewayInputEvent Text) APIGatewayOutputEvent a
+
+echo :: (MonadLogger m, MonadIO m) => Runtime m -> m ()
 echo RuntimeClient{..} = do
   Event{..} <- getNextEvent
   case eventBody of
