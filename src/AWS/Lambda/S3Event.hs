@@ -87,4 +87,4 @@ instance FromJSON a => FromJSON (S3Event a) where
 
 instance ToJSON a => ToJSON (S3Event a) where
   toJSON (S3Event{..}) =
-    object ["records" .= records]
+    object ["Records" .= records]
