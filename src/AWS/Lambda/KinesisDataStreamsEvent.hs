@@ -65,5 +65,5 @@ instance FromJSON a => FromJSON (KinesisDataStreamsEvent a) where
 
 instance ToJSON a => ToJSON (KinesisDataStreamsEvent a) where
   toJSON (KinesisDataStreamsEvent{..}) =
-    object ["records" .= records]
+    object ["Records" .= records]
 
