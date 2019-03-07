@@ -9,8 +9,8 @@ Resources:
   APIGatewayEcho:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: Provided
-      Runtime: Provided
+      Handler: provided
+      Runtime: provided
       CodeUri: '{{ZIP_FILE_PATH}}'
       Description: >
         A simple example of using the runtime client to create an API
