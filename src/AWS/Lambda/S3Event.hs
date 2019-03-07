@@ -20,8 +20,8 @@ data S3 a =
   S3 {
     s3SchemaVersion :: Text,
     configurationId :: Text,
-    bucket          :: Bucket a,
-    s3Object        :: S3Object a
+    bucket          :: Bucket,
+    s3Object        :: S3Object
   } deriving (Show)
 
 instance FromJSON a => FromJSON (S3 a) where
@@ -40,17 +40,17 @@ instance ToJSON a => ToJSON (S3 a) where
       , "object" .= s3Object
     ]
 
-data Bucket a =
+data Bucket =
   Bucket {
     name          :: Text,
     arn           :: Text,
     ownerIdentity :: Maybe (HashMap Text Text)
   } deriving (Show, Generic)
 
-instance FromJSON a => FromJSON (Bucket a)
-instance ToJSON a => ToJSON (Bucket a)
+instance FromJSON Bucket
+instance ToJSON Bucket
 
-data S3Object a =
+data S3Object =
   S3Object {
     key       :: Text,
     size      :: Maybe (Integer),
@@ -59,8 +59,8 @@ data S3Object a =
     sequencer :: Text
   } deriving (Show, Generic)
 
-instance FromJSON a => FromJSON (S3Object a)
-instance ToJSON a => ToJSON (S3Object a)
+instance FromJSON S3Object
+instance ToJSON S3Object
 
 data Record a =
   Record {
