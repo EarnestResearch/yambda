@@ -24,7 +24,7 @@ docker build --tag=aws-lambda-haskell-platform .
 
 ## Building ##
 
-The default make target will compile the executables defined in `stack.yaml`,
+The default make target will compile the executables defined in `package.yaml`,
 produce zip files suitable for lambda, and create SAM templates for each. The
 build artifacts are in the `build` directory.
 
