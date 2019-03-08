@@ -1,15 +1,50 @@
-BUILD_DIR=$(shell stack --docker path --local-install-root)
+BUILD_DIR=build
+EXAMPLES=api-gateway
 
+.PHONY: default
+default: stylish package-all sam-template-all
+
+.PHONY: build
 build:
-	stack build --docker
-	cp ${BUILD_DIR}/bin/aws-lambda-haskell-runtime-client-exe bootstrap
-	zip function.zip bootstrap
-	rm bootstrap
+	stack build --docker --test --copy-bins --local-bin-path ${BUILD_DIR}
 
+sam-tests:
+	sam local generate-event apigateway aws-proxy | \
+		sam local invoke "APIGatewayEcho" -t build/api-gateway.yaml
+
+.PHONY: package-all
+package-all: build
+	$(foreach EXAMPLE,$(EXAMPLES),NAME=$(EXAMPLE) $(MAKE) package;)
+
+.PHONY: package
+package:
+	cp ${BUILD_DIR}/${NAME}-exe ${BUILD_DIR}/bootstrap
+	cd ${BUILD_DIR} && zip ${NAME}.zip bootstrap && rm bootstrap
+
+.PHONY: upload
+upload: sam-template
+	sam package \
+		--template-file ${BUILD_DIR}/${NAME}.yaml \
+		--s3-bucket ${S3_BUCKET} \
+		--output-template-file ${BUILD_DIR}/${NAME}-S3.yaml
+
+.PHONY: sam-template-all
+sam-template-all:
+	$(foreach EXAMPLE,$(EXAMPLES),NAME=$(EXAMPLE) $(MAKE) sam-template;)
+
+.PHONY: sam-template
+sam-template:
+	sed -e "s/{{ZIP_FILE_PATH}}/${NAME}.zip/g" examples/${NAME}/template.yaml > ${BUILD_DIR}/${NAME}.yaml
+	sam validate -t ${BUILD_DIR}/${NAME}.yaml
+
+.PHONY: deploy
+deploy: upload
+	sam deploy \
+		--template-file ${BUILD_DIR}/${NAME}-S3.yaml \
+		--stack-name aws-lambda-haskell-runtime-${NAME} \
+		--capabilities CAPABILITY_IAM
+
+.PHONY: stylish
 stylish:
 	find src -name '*.hs' | xargs stylish-haskell -i
-
-.PHONY:
-	build
-	stylish
 
