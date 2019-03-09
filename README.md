@@ -11,16 +11,7 @@ Examples of how to use this client can be found in the `examples` directory.
 1. [Stylish Haskell](https://github.com/jaspervdj/stylish-haskell)
 1. [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 1. [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-
-### Building in a Docker Container ###
-
-This project is built in a docker container that must be pulled from AWS ECR
-first.
-
-```
-$(aws ecr get-login --region us-west-2 --registry-ids 137112412989 --no-include-email)
-docker build --tag=aws-lambda-haskell-platform .
-```
+1. Get the docker image used for building: `stack docker pull`
 
 ## Building ##
 
@@ -31,6 +22,21 @@ build artifacts are in the `build` directory.
 ```
 make
 ```
+
+### Making Changes to the Build Environment ###
+
+Stack will build the defined executables in a docker container that is similar
+to the lambda environment the executable will run in. If you need to make
+changes to that environment (e.g. add a missing dependency that exists in the
+[AWS Lambda AMI](https://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)),
+update the Dockerfile and then rebuild the image. The base image is pulled from
+amazon, and requires that you login first.
+
+```
+$(aws ecr get-login --region us-west-2 --registry-ids 137112412989 --no-include-email)
+docker build --tag=earnestresearch/earnestresearch/aws-lambda-haskell-platform:lts-12.24 .
+```
+
 
 ## Deploy ##
 
