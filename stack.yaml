@@ -5,5 +5,6 @@ packages:
 
 docker:
   enable: true
-  repo: aws-lambda-haskell-platform:latest
+  repo: earnestresearch/aws-lambda-haskell-platform:lts-12.24
   stack-exe: image
+
