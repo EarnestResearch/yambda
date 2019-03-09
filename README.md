@@ -6,11 +6,11 @@ Examples of how to use this client can be found in the `examples` directory.
 
 ## Prerequisites ##
 
-1. [Stack] (https://docs.haskellstack.org/en/stable/install_and_upgrade/)
-1. [Docker] (https://docs.docker.com/docker-for-mac/install/)
-1. [Stylish Haskell] (https://github.com/jaspervdj/stylish-haskell)
-1. [AWS CLI] (https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
-1. [SAM CLI] (https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+1. [Stack](https://docs.haskellstack.org/en/stable/install_and_upgrade/)
+1. [Docker](https://docs.docker.com/docker-for-mac/install/)
+1. [Stylish Haskell](https://github.com/jaspervdj/stylish-haskell)
+1. [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+1. [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 
 ### Building in a Docker Container ###
 
