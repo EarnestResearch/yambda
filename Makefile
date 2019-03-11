@@ -2,13 +2,13 @@ BUILD_DIR=build
 EXAMPLES=api-gateway
 
 .PHONY: default
-default: stylish package-all sam-template-all
+default: stylish sam-tests
 
 .PHONY: build
 build:
 	stack build --docker --test --copy-bins --local-bin-path ${BUILD_DIR}
 
-sam-tests:
+sam-tests: sam-template-all package-all
 	sam local generate-event apigateway aws-proxy | \
 		sam local invoke "APIGatewayEcho" -t build/api-gateway.yaml
 
