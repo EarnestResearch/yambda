@@ -1,5 +1,5 @@
 BUILD_DIR=build
-EXAMPLES=api-gateway
+EXAMPLES=api-gateway kinesis
 
 .PHONY: default
 default: stylish sam-tests
@@ -11,6 +11,8 @@ build:
 sam-tests: sam-template-all package-all
 	sam local generate-event apigateway aws-proxy | \
 		sam local invoke "APIGatewayEcho" -t build/api-gateway.yaml
+	sam local generate-event kinesis get-records | \
+		sam local invoke "KinesisEcho" -t build/kinesis.yaml
 
 .PHONY: package-all
 package-all: build
