@@ -7,6 +7,11 @@ services:
 env:
   - STACK_VERSION=1.9.3
 
+cache:
+  directories:
+    - $HOME/.stack
+    - $TRAVIS_BUILD_DIR/.stack-work
+
 before_install:
   - mkdir -p ~/.local/bin
   - export PATH=$HOME/.local/bin:$PATH
