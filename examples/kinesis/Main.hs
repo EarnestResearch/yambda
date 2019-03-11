@@ -17,7 +17,7 @@ main = runStderrLoggingT $ do
   client <- runtimeClient
   forever $ echo client
 
-echo :: (MonadLogger m, MonadIO m) => RuntimeClient (KinesisDataStreamsEvent Text) (KinesisDataStreamsEvent Text) m -> m ()
+echo :: (MonadLogger m, MonadIO m) => RuntimeClient KinesisDataStreamsEvent KinesisDataStreamsEvent m -> m ()
 echo RuntimeClient{..} = do
   Event{..} <- getNextEvent
   case eventBody of
