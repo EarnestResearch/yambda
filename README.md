@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/EarnestResearch/aws-lambda-haskell-runtime-client.svg?branch=master)](https://travis-ci.org/EarnestResearch/aws-lambda-haskell-runtime-client)
+
 # aws-lambda-haskell-runtime-client
 
 A custom runtime client for AWS Lamda written in Haskell.
