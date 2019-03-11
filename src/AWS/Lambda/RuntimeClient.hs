@@ -26,10 +26,10 @@ import           Data.Maybe
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           GHC.Generics
+import qualified Network.HTTP.Client as C
 import           Network.Wreq
 import           Network.Wreq.Session as S
 import           System.Environment
-import qualified Network.HTTP.Client as C
 
 newtype EventID = EventID String deriving (Show)
 type ErrorMessage = String
