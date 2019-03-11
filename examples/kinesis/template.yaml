@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Kinesis Echo
+
+  A simple example of using the runtime client that echoes a Kinesis event.
+Resources:
+  KinesisEcho:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: provided
+      Runtime: provided
+      CodeUri: '{{ZIP_FILE_PATH}}'
+      Description: >
+        A simple example of using the runtime client that echoes a Kinesis event.
