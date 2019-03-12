@@ -53,9 +53,9 @@ instance ToJSON Bucket
 data S3Object =
   S3Object {
     key       :: Text,
-    size      :: Maybe (Integer),
-    eTag      :: Maybe (Text),
-    versionId :: Text,
+    size      :: Maybe Integer,
+    eTag      :: Maybe Text,
+    versionId :: Maybe Text,
     sequencer :: Text
   } deriving (Show, Generic)
 
