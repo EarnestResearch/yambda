@@ -1,5 +1,5 @@
 BUILD_DIR=build
-EXAMPLES=api-gateway kinesis
+EXAMPLES=api-gateway kinesis s3
 
 .PHONY: default
 default: stylish sam-tests
