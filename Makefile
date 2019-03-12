@@ -1,5 +1,5 @@
 BUILD_DIR=build
-EXAMPLES=api-gateway kinesis
+EXAMPLES=api-gateway kinesis s3
 
 .PHONY: default
 default: stylish sam-tests
@@ -13,6 +13,10 @@ sam-tests: sam-template-all package-all
 		sam local invoke "APIGatewayEcho" -t build/api-gateway.yaml
 	sam local generate-event kinesis get-records | \
 		sam local invoke "KinesisEcho" -t build/kinesis.yaml
+	sam local generate-event s3 delete | \
+		sam local invoke "S3Echo" -t build/s3.yaml
+	sam local generate-event s3 put | \
+		sam local invoke "S3Echo" -t build/s3.yaml
 
 .PHONY: package-all
 package-all: build

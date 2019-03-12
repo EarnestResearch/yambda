@@ -47,6 +47,15 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - aws-lambda-haskell-runtime-client
+  s3-exe:
+    main:                Main.hs
+    source-dirs:         examples/s3
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aws-lambda-haskell-runtime-client
 
 tests:
   aws-lambda-haskell-runtime-client-test:

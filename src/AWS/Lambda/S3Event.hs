@@ -16,7 +16,7 @@ import Data.HashMap.Strict
 import Data.Text (Text)
 import GHC.Generics
 
-data S3 a =
+data S3 =
   S3 {
     s3SchemaVersion :: Text,
     configurationId :: Text,
@@ -24,14 +24,14 @@ data S3 a =
     s3Object        :: S3Object
   } deriving (Show)
 
-instance FromJSON a => FromJSON (S3 a) where
+instance FromJSON S3 where
   parseJSON (Object v) = S3
     <$> v .: "s3SchemaVersion"
     <*> v .: "configurationId"
     <*> v .: "bucket"
     <*> ((v .: "object") >>= parseJSON)
 
-instance ToJSON a => ToJSON (S3 a) where
+instance ToJSON S3 where
   toJSON S3{..} =
     object [
         "s3SchemaVersion" .= s3SchemaVersion
@@ -62,33 +62,33 @@ data S3Object =
 instance FromJSON S3Object
 instance ToJSON S3Object
 
-data Record a =
+data Record =
   Record {
     eventVersion      :: Text,
     eventSource       :: Text,
     awsRegion         :: Text,
     eventTime         :: Text,
     eventName         :: Text,
-    s3                :: S3 a,
+    s3                :: S3,
     userIdentity      :: Maybe (HashMap Text Text),
     requestParameters :: Maybe (HashMap Text Text),
     responseElements  :: Maybe (HashMap Text Text),
     glacierEventData  :: Maybe (HashMap Text Value)
   } deriving (Show, Generic)
 
-instance FromJSON a => FromJSON (Record a)
-instance ToJSON a => ToJSON (Record a)
+instance FromJSON Record
+instance ToJSON Record
 
-data S3Event a =
+data S3Event =
   S3Event {
-    records :: [Record a]
+    records :: [Record]
   }
 
-instance FromJSON a => FromJSON (S3Event a) where
+instance FromJSON S3Event where
   parseJSON = withObject "S3Event" $
     \v -> S3Event
       <$> ((v .: "Records") >>= parseJSONList)
 
-instance ToJSON a => ToJSON (S3Event a) where
+instance ToJSON S3Event where
   toJSON (S3Event{..}) =
     object ["Records" .= records]
