@@ -25,7 +25,7 @@ install:
   - docker save earnestresearch/aws-lambda-haskell-platform:lts-12.24 | gzip > docker/aws-lambda-haskell-platform.tar.gz
 
 before_script:
-  - gzip -dc docker/aws-lambda-haskell-platform.tar.gz | docker load
+  - gzip -dc docker/aws-lambda-haskell-platform.tar.gz | docker load || true
   - stack docker pull
 
 script:
