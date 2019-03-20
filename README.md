@@ -25,6 +25,12 @@ build artifacts are in the `build` directory.
 make
 ```
 
+### Out of Memory Error ###
+
+If you see an error message similar to
+`Process exited with code: ExitFailure (-9) (THIS MAY INDICATE OUT OF MEMORY)`,
+especially on your first build, try `stack build --docker -j1`.
+
 ### Making Changes to the Build Environment ###
 
 Stack will build the defined executables in a docker container that is similar
@@ -38,7 +44,6 @@ amazon, and requires that you login first.
 $(aws ecr get-login --region us-west-2 --registry-ids 137112412989 --no-include-email)
 docker build --tag=earnestresearch/earnestresearch/aws-lambda-haskell-platform:lts-12.24 .
 ```
-
 
 ## Deploy ##
 
