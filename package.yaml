@@ -33,6 +33,8 @@ executables:
     main:                Main.hs
     source-dirs:         examples/api-gateway
     ghc-options:
+    - -Wall
+    - -Werror
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
@@ -51,6 +53,8 @@ executables:
     main:                Main.hs
     source-dirs:         examples/s3
     ghc-options:
+    - -Wall
+    - -Werror
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N

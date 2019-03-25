@@ -9,8 +9,7 @@ import AWS.Lambda.RuntimeClient
 import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Logger
-import Control.Monad.Trans.Class
-import Data.Text (Text, pack)
+import Data.Text (pack)
 
 main :: IO ()
 main = runStderrLoggingT $ do
