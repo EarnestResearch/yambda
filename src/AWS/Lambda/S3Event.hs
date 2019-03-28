@@ -23,6 +23,7 @@ modify :: String -> String
 modify "_records" = "Records"
 modify k = drop 1 k
 
+
 data Record = Record
   { _eventVersion :: Text
   , _eventSource :: Text
@@ -51,10 +52,14 @@ data S3 = S3
   } deriving (Eq, Generic, Show)
 
 instance ToJSON S3 where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 1 }
+  toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify' }
 
 instance FromJSON S3 where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = modify' }
+
+modify':: String -> String
+modify' "_s3Object" = "object"
+modify' k = drop 1 k
 
 
 data Bucket = Bucket
