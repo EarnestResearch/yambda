@@ -10,10 +10,9 @@ Examples of how to use this client can be found in the `examples` directory.
 
 1. [Stack](https://docs.haskellstack.org/en/stable/install_and_upgrade/)
 1. [Docker](https://docs.docker.com/docker-for-mac/install/)
-1. [Stylish Haskell](https://github.com/jaspervdj/stylish-haskell)
 1. [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 1. [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-1. Get the docker image used for building: `stack docker pull`
+1. Run `make ready` to pull the docker image used to build, install the stylish haskell code formatter, etc.
 
 ## Building ##
 

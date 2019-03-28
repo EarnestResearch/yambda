@@ -51,7 +51,14 @@ deploy: upload ## deploy lambda to AWS using SAM CLI
 stylish: ## run stylish haskell code formatter
 	find src -name '*.hs' | xargs stylish-haskell -i
 
+PACKAGES = stylish-haskell
+.PHONY: ready
+ready: ## pull the docker image used to build, install code formatter, etc
+	stack docker pull
+	for i in $(PACKAGES); do stack install $$i --no-docker;  done
+
 .PHONY: help
 help: ## help
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 	| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-18s\033[0m %s\n", $$1, $$2}'
+
