@@ -1,5 +1,5 @@
-{-# language DeriveGeneric #-}
-{-# language TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE TemplateHaskell #-}
 module AWS.Lambda.APIGatewayInputEvent where
 
 import Control.Lens

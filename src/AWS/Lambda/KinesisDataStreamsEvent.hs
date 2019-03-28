@@ -1,6 +1,6 @@
-{-# language DeriveGeneric   #-}
-{-# language RecordWildCards #-}
-{-# language TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
 module AWS.Lambda.KinesisDataStreamsEvent where
 
 import Control.Lens
@@ -24,7 +24,7 @@ instance FromJSON Kinesis where
 
 modify :: String -> String
 modify "_payload" = "data"
-modify k  = drop 1 k
+modify k          = drop 1 k
 
 
 data Record = Record
@@ -56,7 +56,7 @@ instance FromJSON KinesisDataStreamsEvent where
 
 modify' :: String -> String
 modify' "_records" = "Records"
-modify' k = drop 1 k
+modify' k          = drop 1 k
 
 
 makeLenses ''Kinesis
