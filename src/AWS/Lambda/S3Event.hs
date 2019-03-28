@@ -14,11 +14,14 @@ newtype S3Event = S3Event { _records :: [Record] }
   deriving (Eq, Generic, Show)
 
 instance ToJSON S3Event where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 1 }
+  toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify }
 
 instance FromJSON S3Event where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = modify }
 
+modify :: String -> String
+modify "_records" = "Records"
+modify k = drop 1 k
 
 data Record = Record
   { _eventVersion :: Text
