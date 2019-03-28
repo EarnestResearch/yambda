@@ -93,4 +93,5 @@ instance FromJSON S3Object where
 makeLenses ''S3Event
 makeLenses ''Record
 makeLenses ''S3
+makeLenses ''Bucket
 makeLenses ''S3Object
