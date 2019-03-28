@@ -17,9 +17,8 @@ Examples of how to use this client can be found in the `examples` directory.
 
 ## Building ##
 
-The default make target will compile the executables defined in `package.yaml`,
-produce zip files suitable for lambda, and create SAM templates for each. The
-build artifacts are in the `build` directory.
+The default make target will compile and test the executables defined in
+`package.yaml`. You can find the produced artifacts in the `build` directory.
 
 ```
 make
