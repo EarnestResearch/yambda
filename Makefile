@@ -2,10 +2,10 @@ BUILD_DIR = build
 EXAMPLES  = api-gateway kinesis s3
 
 .PHONY: build
-build:
+build: ## compile and test
 	stack build --docker --test --copy-bins --local-bin-path ${BUILD_DIR}
 
-sam-tests: sam-template-all package-all
+sam-tests: sam-template-all package-all ## compile, test, and invoke each example with a generated event
 	sam local generate-event apigateway aws-proxy | \
 		sam local invoke "APIGatewayEcho" -t build/api-gateway.yaml
 	sam local generate-event kinesis get-records | \
@@ -25,7 +25,7 @@ package:
 	cd ${BUILD_DIR} && zip ${NAME}.zip bootstrap && rm bootstrap
 
 .PHONY: upload
-upload: sam-template
+upload: sam-template ## upload lambda to S3 using SAM CLI
 	sam package \
 		--template-file ${BUILD_DIR}/${NAME}.yaml \
 		--s3-bucket ${S3_BUCKET} \
@@ -41,13 +41,17 @@ sam-template:
 	sam validate -t ${BUILD_DIR}/${NAME}.yaml
 
 .PHONY: deploy
-deploy: upload
+deploy: upload ## deploy lambda to AWS using SAM CLI
 	sam deploy \
 		--template-file ${BUILD_DIR}/${NAME}-S3.yaml \
 		--stack-name aws-lambda-haskell-runtime-${NAME} \
 		--capabilities CAPABILITY_IAM
 
 .PHONY: stylish
-stylish:
+stylish: ## run stylish haskell code formatter
 	find src -name '*.hs' | xargs stylish-haskell -i
 
+.PHONY: help
+help: ## help
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+	| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-18s\033[0m %s\n", $$1, $$2}'
