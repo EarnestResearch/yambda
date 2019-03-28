@@ -22,7 +22,7 @@ clean: ## clean
 	stack clean
 
 lint: ## run lint
-	hlint examples src test
+	hlint examples src
 
 sam-tests: sam-template-all package-all ## sam test
 	sam local generate-event apigateway aws-proxy | \
