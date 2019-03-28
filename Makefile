@@ -1,9 +1,6 @@
 BUILD_DIR = build
 EXAMPLES  = api-gateway kinesis s3
 
-.PHONY: default
-default: stylish sam-tests
-
 .PHONY: build
 build:
 	stack build --docker --test --copy-bins --local-bin-path ${BUILD_DIR}
