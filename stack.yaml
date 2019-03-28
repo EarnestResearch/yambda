@@ -7,4 +7,3 @@ docker:
   enable: true
   repo: earnestresearch/aws-lambda-haskell-platform:lts-13.11
   stack-exe: image
-

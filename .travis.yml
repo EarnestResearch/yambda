@@ -24,4 +24,5 @@ install:
   - stack docker pull
 
 script:
+  - make stack-install
   - make build

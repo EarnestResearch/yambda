@@ -73,7 +73,7 @@ runtimeClient = do
   runtimeHost <- liftIO $ lookupEnv runtimeHostEnv
   session     <- liftIO $ S.newSessionControl Nothing settings
   unless (isJust runtimeHost) ($(logErrorSH) errorMsg)
-  let endpoints' = endpoints . (forceMaybe errorMsg) $ runtimeHost
+  let endpoints' = endpoints . forceMaybe errorMsg $ runtimeHost
   pure $
     RuntimeClient {
       getNextEvent  = getNextEvent' endpoints' session
@@ -97,9 +97,7 @@ endpoints host =
   where baseURL' = "http://" <> host <> "/2018-06-01/runtime"
 
 forceMaybe :: String -> Maybe a -> a
-forceMaybe errorMsg maybe' = case maybe' of
-  Just a' -> a'
-  Nothing -> error errorMsg
+forceMaybe errorMsg = fromMaybe (error errorMsg)
 
 getNextEvent' :: (FromJSON e, MonadIO m, MonadLogger m) => Endpoints -> Session -> m (Event e)
 getNextEvent' Endpoints{..} session = do
@@ -155,4 +153,3 @@ postInitError' Endpoints{..} session error' = do
     error''  = encode error'
   liftIO $ S.post session errorURL error''
   return ()
-

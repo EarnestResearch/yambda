@@ -1,6 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TypeApplications  #-}
 
 module Main where
 
@@ -21,5 +20,5 @@ echo :: (MonadLogger m, MonadIO m) => RuntimeClient KinesisDataStreamsEvent Kine
 echo RuntimeClient{..} = do
   Event{..} <- getNextEvent
   case eventBody of
-    Right (e@KinesisDataStreamsEvent{..}) -> postResponse eventID e
+    Right e -> postResponse eventID e
     Left e -> postError eventID $ Error "Unexpected Error" $ pack e
