@@ -66,8 +66,12 @@ tests:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
+    - -Wall
+    - -Werror
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
     - aws-lambda-haskell-runtime-client
+    - HUnit
+    - hspec
