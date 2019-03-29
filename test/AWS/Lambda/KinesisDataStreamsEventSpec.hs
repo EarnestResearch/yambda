@@ -1,9 +1,9 @@
-{-# language OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 module AWS.Lambda.KinesisDataStreamsEventSpec where
 
 import AWS.Lambda.KinesisDataStreamsEvent
-import Data.HashMap.Strict as H
 import Data.Aeson
+import Data.HashMap.Strict as H
 import Test.Hspec
 -- import Test.HUnit
 
@@ -26,4 +26,4 @@ testCodecKinesisDataStreamsEvent = do
     Nothing -> j `shouldNotBe` Nothing
   case s' of
     Just s'' -> s'' `shouldBe` s
-    Nothing -> s' `shouldNotBe` Nothing
+    Nothing  -> s' `shouldNotBe` Nothing

@@ -1,5 +1,5 @@
-{-# language OverloadedStrings #-}
-{-# language RecordWildCards   #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 module Main where
 
 import AWS.Lambda.APIGatewayInputEvent
@@ -21,4 +21,4 @@ echo RuntimeClient{..} = do
   Event{..} <- getNextEvent
   case eventBody of
     Right ie -> postResponse eventID $ apiGatewayOutputEvent $ ie ^. body
-    Left e -> postError eventID $ Error "Unexpected Error" $ pack e
+    Left e   -> postError eventID $ Error "Unexpected Error" $ pack e

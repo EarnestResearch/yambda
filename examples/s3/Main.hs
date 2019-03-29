@@ -1,9 +1,9 @@
-{-# language OverloadedStrings #-}
-{-# language RecordWildCards   #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 module Main where
 
-import AWS.Lambda.S3Event
 import AWS.Lambda.RuntimeClient
+import AWS.Lambda.S3Event
 import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Logger
@@ -19,4 +19,4 @@ echo RuntimeClient{..} = do
   Event{..} <- getNextEvent
   case eventBody of
     Right e -> postResponse eventID e
-    Left e -> postError eventID $ Error "Unexpected Error" $ pack e
+    Left e  -> postError eventID $ Error "Unexpected Error" $ pack e
