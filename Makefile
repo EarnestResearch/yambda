@@ -5,6 +5,10 @@ EXAMPLES  = api-gateway kinesis s3
 build: ## compile and test
 	stack build --docker --test --copy-bins --local-bin-path ${BUILD_DIR}
 
+.PHONY: clean
+clean: ## remove all cached files
+	stack clean --full
+
 sam-tests: sam-template-all package-all ## compile, test, and invoke each example with a generated event
 	sam local generate-event apigateway aws-proxy | \
 		sam local invoke "APIGatewayEcho" -t build/api-gateway.yaml
