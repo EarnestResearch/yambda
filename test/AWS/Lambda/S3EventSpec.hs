@@ -1,9 +1,9 @@
-{-# language OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 module AWS.Lambda.S3EventSpec where
 
 import AWS.Lambda.S3Event
-import Data.HashMap.Strict as H
 import Data.Aeson
+import Data.HashMap.Strict as H
 import Test.Hspec
 
 spec :: Spec
@@ -28,7 +28,7 @@ testCodecS3Event = do
     Nothing -> j `shouldNotBe` Nothing
   case s' of
     Just s'' -> s'' `shouldBe` s
-    Nothing -> s' `shouldNotBe` Nothing
+    Nothing  -> s' `shouldNotBe` Nothing
 
 testCodecS3 :: Expectation
 testCodecS3 = do
@@ -46,4 +46,4 @@ testCodecS3 = do
     Nothing -> j' `shouldNotBe` Nothing
   case s3'' of
     Just s3''' -> s3''' `shouldBe` s3'
-    Nothing -> s3'' `shouldNotBe` Nothing
+    Nothing    -> s3'' `shouldNotBe` Nothing

@@ -1,10 +1,10 @@
-{-# language OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 module AWS.Lambda.KinesisSpec where
 
 import AWS.Lambda.KinesisDataStreamsEvent
 import Control.Lens
-import Data.HashMap.Strict as H
 import Data.Aeson
+import Data.HashMap.Strict as H
 import Test.Hspec
 
 spec :: Spec

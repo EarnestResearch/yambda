@@ -49,7 +49,7 @@ deploy: upload ## deploy lambda to AWS using SAM CLI
 
 .PHONY: stylish
 stylish: ## run stylish haskell code formatter
-	find src -name '*.hs' | xargs stylish-haskell -i
+	find . -name '*.hs' | xargs stylish-haskell -i
 
 PACKAGES = stylish-haskell
 .PHONY: ready

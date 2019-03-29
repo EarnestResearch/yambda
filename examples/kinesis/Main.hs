@@ -21,4 +21,4 @@ echo RuntimeClient{..} = do
   Event{..} <- getNextEvent
   case eventBody of
     Right e -> postResponse eventID e
-    Left e -> postError eventID $ Error "Unexpected Error" $ pack e
+    Left e  -> postError eventID $ Error "Unexpected Error" $ pack e
