@@ -5,6 +5,10 @@ EXAMPLES  = api-gateway kinesis s3
 build: ## compile and test
 	stack build --docker --test --copy-bins --local-bin-path ${BUILD_DIR}
 
+.PHONY: dev
+dev: ## automatically compile and test when a file is written
+	stack build --test --no-docker --file-watch
+
 .PHONY: clean
 clean: ## remove all cached files
 	stack clean --full
