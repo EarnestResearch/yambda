@@ -21,7 +21,7 @@ before_install:
     tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 
 install:
-  - stack docker pull
+  - make ready
 
 script:
-  - make build
+  - make lint build
