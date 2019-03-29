@@ -1,3 +1,4 @@
+{- HLINT ignore "Reduce duplication" -}
 {-# LANGUAGE OverloadedStrings #-}
 module AWS.Lambda.S3EventSpec where
 

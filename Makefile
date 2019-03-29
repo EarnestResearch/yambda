@@ -47,11 +47,16 @@ deploy: upload ## deploy lambda to AWS using SAM CLI
 		--stack-name aws-lambda-haskell-runtime-${NAME} \
 		--capabilities CAPABILITY_IAM
 
+.PHONY: lint
+lint: ## run linter
+	hlint examples src test
+
 .PHONY: stylish
 stylish: ## run stylish haskell code formatter
 	find . -name '*.hs' | xargs stylish-haskell -i
 
-PACKAGES = stylish-haskell
+PACKAGES = stylish-haskell hlint
+
 .PHONY: ready
 ready: ## pull the docker image used to build, install code formatter, etc
 	stack docker pull
