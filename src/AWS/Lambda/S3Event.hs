@@ -1,94 +1,97 @@
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE DeriveAnyClass  #-}
+{-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE TemplateHaskell #-}
+module AWS.Lambda.S3Event where
 
-module AWS.Lambda.S3Event
-  (
-    S3Event(..),
-    S3(..),
-    S3Object(..),
-    Bucket(..),
-    Record(..)
-  ) where
-
+import Control.Lens
 import Data.Aeson
 import Data.HashMap.Strict
-import Data.Text (Text)
+import Data.Text hiding (drop)
 import GHC.Generics
 
-data S3 =
-  S3 {
-    s3SchemaVersion :: Text,
-    configurationId :: Text,
-    bucket          :: Bucket,
-    s3Object        :: S3Object
-  } deriving (Show)
 
-instance FromJSON S3 where
-  parseJSON (Object v) = S3
-    <$> v .: "s3SchemaVersion"
-    <*> v .: "configurationId"
-    <*> v .: "bucket"
-    <*> ((v .: "object") >>= parseJSON)
-
-instance ToJSON S3 where
-  toJSON S3{..} =
-    object [
-        "s3SchemaVersion" .= s3SchemaVersion
-      , "configurationId" .= configurationId
-      , "bucket" .= bucket
-      , "object" .= s3Object
-    ]
-
-data Bucket =
-  Bucket {
-    name          :: Text,
-    arn           :: Text,
-    ownerIdentity :: Maybe (HashMap Text Text)
-  } deriving (Show, Generic)
-
-instance FromJSON Bucket
-instance ToJSON Bucket
-
-data S3Object =
-  S3Object {
-    key       :: Text,
-    size      :: Maybe Integer,
-    eTag      :: Maybe Text,
-    versionId :: Maybe Text,
-    sequencer :: Text
-  } deriving (Show, Generic)
-
-instance FromJSON S3Object
-instance ToJSON S3Object
-
-data Record =
-  Record {
-    eventVersion      :: Text,
-    eventSource       :: Text,
-    awsRegion         :: Text,
-    eventTime         :: Text,
-    eventName         :: Text,
-    s3                :: S3,
-    userIdentity      :: Maybe (HashMap Text Text),
-    requestParameters :: Maybe (HashMap Text Text),
-    responseElements  :: Maybe (HashMap Text Text),
-    glacierEventData  :: Maybe (HashMap Text Value)
-  } deriving (Show, Generic)
-
-instance FromJSON Record
-instance ToJSON Record
-
-data S3Event =
-  S3Event {
-    records :: [Record]
-  }
-
-instance FromJSON S3Event where
-  parseJSON = withObject "S3Event" $
-    \v -> S3Event
-      <$> ((v .: "Records") >>= parseJSONList)
+newtype S3Event = S3Event { _records :: [Record] }
+  deriving (Eq, Generic, Show)
 
 instance ToJSON S3Event where
-  toJSON (S3Event{..}) =
-    object ["Records" .= records]
+  toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify }
+
+instance FromJSON S3Event where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = modify }
+
+modify :: String -> String
+modify "_records" = "Records"
+modify k          = drop 1 k
+
+
+data Record = Record
+  { _eventVersion      :: Text
+  , _eventSource       :: Text
+  , _awsRegion         :: Text
+  , _eventTime         :: Text
+  , _eventName         :: Text
+  , _s3                :: S3
+  , _userIdentity      :: Maybe (HashMap Text Text)
+  , _requestParameters :: Maybe (HashMap Text Text)
+  , _responseElements  :: Maybe (HashMap Text Text)
+  , _glacierEventData  :: Maybe (HashMap Text Value)
+  } deriving (Eq, Generic, Show)
+
+instance ToJSON Record where
+  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 1 }
+
+instance FromJSON Record where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
+
+
+data S3 = S3
+  { _s3SchemaVersion :: Text
+  , _configurationId :: Text
+  , _bucket          :: Bucket
+  , _s3Object        :: S3Object
+  } deriving (Eq, Generic, Show)
+
+instance ToJSON S3 where
+  toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify' }
+
+instance FromJSON S3 where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = modify' }
+
+modify':: String -> String
+modify' "_s3Object" = "object"
+modify' k           = drop 1 k
+
+
+data Bucket = Bucket
+  { _name          :: Text
+  , _arn           :: Text
+  , _ownerIdentity :: Maybe (HashMap Text Text)
+  } deriving (Eq, Generic, Show)
+
+instance ToJSON Bucket where
+  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 1 }
+
+instance FromJSON Bucket where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
+
+
+data S3Object = S3Object
+  { _key       :: Text
+  , _size      :: Maybe Integer
+  , _eTag      :: Maybe Text
+  , _versionId :: Maybe Text
+  , _sequencer :: Text
+  } deriving (Eq, Generic, Show)
+
+instance ToJSON S3Object where
+  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 1 }
+
+instance FromJSON S3Object where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
+
+
+makeLenses ''S3Event
+makeLenses ''Record
+makeLenses ''S3
+makeLenses ''Bucket
+makeLenses ''S3Object

@@ -1,7 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TypeApplications  #-}
-
+{-# language OverloadedStrings #-}
+{-# language RecordWildCards   #-}
 module Main where
 
 import AWS.Lambda.S3Event
