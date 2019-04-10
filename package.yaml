@@ -60,6 +60,17 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - aws-lambda-haskell-runtime-client
+  sns-exe:
+    main:                Main.hs
+    source-dirs:         examples/sns
+    ghc-options:
+    - -Wall
+    - -Werror
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aws-lambda-haskell-runtime-client
 
 tests:
   aws-lambda-haskell-runtime-client-test:
