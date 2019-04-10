@@ -1,5 +1,5 @@
 BUILD_DIR = build
-EXAMPLES  = api-gateway kinesis s3
+EXAMPLES  = api-gateway kinesis s3 sns
 
 .PHONY: build
 build: ## compile and test
@@ -20,8 +20,8 @@ sam-tests: sam-template-all package-all ## compile, test, and invoke each exampl
 		sam local invoke "KinesisEcho" -t build/kinesis.yaml
 	sam local generate-event s3 delete | \
 		sam local invoke "S3Echo" -t build/s3.yaml
-	sam local generate-event s3 put | \
-		sam local invoke "S3Echo" -t build/s3.yaml
+	sam local generate-event sns notification | \
+		sam local invoke "SNSEcho" -t build/sns.yaml
 
 .PHONY: package-all
 package-all: build
