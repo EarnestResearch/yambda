@@ -24,11 +24,11 @@ instance FromJSON SNSEvent where
 modify :: String -> String
 modify "_snsType"       = "Type"
 modify "_attributeType" = "Type"
-modify v                = capitalize . (drop 1) $ v
+modify v                = capitalize . drop 1 $ v
 
 capitalize :: String -> String
 capitalize ""     = ""
-capitalize (x:xs) = (C.toUpper x):xs
+capitalize (x:xs) = C.toUpper x : xs
 
 data Record = Record
   { _eventVersion         :: Text
