@@ -48,7 +48,7 @@ docker build --tag=earnestresearch/earnestresearch/aws-lambda-haskell-platform:l
 The deploy make target will create the resources needed for the specified lambda.
 
 ```
-NAME=api-gateway S3_BUCKET=<your s3 bucket name> make deploy
+NAME=api-gateway S3_BUCKET=<your s3 bucket name> make build package deploy
 ```
 
 ## Adding an Example ##
