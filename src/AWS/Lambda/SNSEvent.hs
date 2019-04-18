@@ -54,7 +54,7 @@ data SNS = SNS
   , _snsType           :: Text
   , _unsubscribeUrl    :: Text
   , _topicArn          :: Text
-  , _subject           :: Text
+  , _subject           :: Maybe Text
   } deriving (Eq, Generic, Show)
 
 instance ToJSON SNS where
