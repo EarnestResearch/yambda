@@ -44,16 +44,16 @@ instance FromJSON Record where
   parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = modify }
 
 data SNS = SNS
-  { _signatureVersion  :: Text
-  , _timestamp         :: Text
-  , _signature         :: Text
-  , _signingCertUrl    :: Text
-  , _messageId         :: Text
-  , _message           :: Text
-  , _messageAttributes :: HashMap Text MessageAttribute
-  , _snsType           :: Text
-  , _unsubscribeUrl    :: Text
-  , _topicArn          :: Text
+  { _signatureVersion  :: Text 
+  , _timestamp         :: Text 
+  , _signature         :: Text 
+  , _signingCertUrl    :: Text 
+  , _messageId         :: Text 
+  , _message           :: Text 
+  , _messageAttributes :: Maybe (HashMap Text MessageAttribute)
+  , _snsType           :: Text 
+  , _unsubscribeUrl    :: Text 
+  , _topicArn          :: Text 
   , _subject           :: Maybe Text
   } deriving (Eq, Generic, Show)
 
