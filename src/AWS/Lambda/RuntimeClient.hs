@@ -18,13 +18,11 @@ import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Logger
-import           Control.Monad.Trans.Class
 import           Data.Aeson hiding (Error)
 import qualified Data.ByteString.Char8 as B
 import           Data.ByteString.Lazy.Internal
 import           Data.Maybe
 import           Data.Text (Text)
-import qualified Data.Text as T
 import           GHC.Generics
 import qualified Network.HTTP.Client as C
 import           Network.Wreq
@@ -121,9 +119,8 @@ setTraceID response = do
 parseEventID :: (MonadIO m, MonadLogger m) => Response ByteString -> m EventID
 parseEventID response = do
   let
-    header   = "Lambda-Runtime-Aws-Request-Id"
     errorMsg = "Missing required response header \"Lambda-Runtime-Aws-Request-Id\"."
-    eventID  = fmap (EventID . B.unpack) (response ^? responseHeader header)
+    eventID  = fmap (EventID . B.unpack) (response ^? responseHeader "Lambda-Runtime-Aws-Request-Id")
   unless (isJust eventID) ($(logErrorSH) errorMsg)
   pure $ forceMaybe errorMsg eventID
 
@@ -131,26 +128,17 @@ parseEvent :: (FromJSON e) => Response ByteString -> Either ErrorMessage e
 parseEvent = eitherDecode . (^. responseBody)
 
 postResponse' :: (ToJSON r, MonadIO m, MonadLogger m) => Endpoints -> Session -> EventID -> r -> m ()
-postResponse' Endpoints{..} session (EventID eventID) r = do
-  let
-    responseURL = baseURL <> "/invocation/" <> eventID <> "/response"
-    response    = encode r
-  liftIO $ S.post session responseURL response
-  return ()
+postResponse' Endpoints{..} session (EventID eventID) response =
+  void . liftIO $ S.post session responseURL (encode response)
+  where responseURL = baseURL <> "/invocation/" <> eventID <> "/response"
 
 postError' :: (MonadIO m, MonadLogger m) => Endpoints -> Session -> EventID -> Error -> m ()
-postError' Endpoints{..} session (EventID eventID) error' = do
-  let
-    errorURL = baseURL <> "/invocation/" <> eventID <> "/error"
-    error''  = encode error'
-  liftIO $ S.post session errorURL error''
-  return ()
+postError' Endpoints{..} session (EventID eventID) error' =
+  void . liftIO $ S.post session errorURL (encode error')
+  where errorURL = baseURL <> "/invocation/" <> eventID <> "/error"
 
 postInitError' :: (MonadIO m, MonadLogger m) => Endpoints -> Session -> Error -> m ()
-postInitError' Endpoints{..} session error' = do
-  let
-    errorURL = baseURL <> "/init/error"
-    error''  = encode error'
-  liftIO $ S.post session errorURL error''
-  return ()
+postInitError' Endpoints{..} session error' =
+  void . liftIO $ S.post session errorURL (encode error')
+  where errorURL = baseURL <> "/init/error"
 

@@ -5,7 +5,6 @@ module AWS.Lambda.KinesisDataStreamsEvent where
 
 import Control.Lens
 import Data.Aeson
-import Data.HashMap.Strict
 import Data.Text (Text)
 import GHC.Generics
 
