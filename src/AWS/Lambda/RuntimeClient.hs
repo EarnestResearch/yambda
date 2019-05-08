@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE RankNTypes                 #-}
@@ -6,14 +7,15 @@
 {-# LANGUAGE TemplateHaskell            #-}
 
 module AWS.Lambda.RuntimeClient
-  (
-    runtimeClient
+  ( runtimeClient
+  , runtimeClientWith
   , RuntimeClient(..)
   , Error(..)
   , Event(..)
   , EventID
   ) where
 
+import           AWS.Lambda.HttpClient
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
@@ -24,9 +26,6 @@ import           Data.ByteString.Lazy.Internal
 import           Data.Maybe
 import           Data.Text (Text)
 import           GHC.Generics
-import qualified Network.HTTP.Client as C
-import           Network.Wreq
-import           Network.Wreq.Session as S
 import           System.Environment
 
 newtype EventID = EventID String deriving (Show)
@@ -59,26 +58,28 @@ data RuntimeClient e r m =
   , postInitError :: (MonadIO m, MonadLogger m) => Error -> m ()
   }
 
-runtimeClient :: (FromJSON e, ToJSON r, MonadLogger m, MonadIO m) => m (RuntimeClient e r m)
-runtimeClient = do
-  let
-    runtimeHostEnv = "AWS_LAMBDA_RUNTIME_API"
-    errorMsg = "Missing required environment variable \'AWS_LAMBDA_RUNTIME_API\'."
-    settings =
-      C.defaultManagerSettings {
-        C.managerResponseTimeout = C.responseTimeoutNone
-      }
+runtimeClient ::
+  (FromJSON e, ToJSON r, MonadLogger m, MonadIO m) =>
+  m (RuntimeClient e r m)
+runtimeClient = runtimeClientWith =<< liftIO defaultHttpClient
+
+runtimeClientWith ::
+  (HttpResponse a ByteString, FromJSON e, ToJSON r, MonadLogger m, MonadIO m) =>
+  HttpClient a -> m (RuntimeClient e r m)
+runtimeClientWith httpClient = do
   runtimeHost <- liftIO $ lookupEnv runtimeHostEnv
-  session     <- liftIO $ S.newSessionControl Nothing settings
   unless (isJust runtimeHost) ($(logErrorSH) errorMsg)
-  let endpoints' = endpoints . forceMaybe errorMsg $ runtimeHost
+  let endpoints' = endpoints $ forceMaybe errorMsg runtimeHost
   pure $
     RuntimeClient {
-      getNextEvent  = getNextEvent' endpoints' session
-    , postResponse  = postResponse' endpoints' session
-    , postError     = postError' endpoints' session
-    , postInitError = postInitError' endpoints' session
+      getNextEvent  = getNextEvent'  endpoints' httpClient
+    , postResponse  = postResponse'  endpoints' httpClient
+    , postError     = postError'     endpoints' httpClient
+    , postInitError = postInitError' endpoints' httpClient
     }
+  where
+    runtimeHostEnv = "AWS_LAMBDA_RUNTIME_API"
+    errorMsg = "Missing required environment variable \'AWS_LAMBDA_RUNTIME_API\'."
 
 data Endpoints =
   Endpoints {
@@ -97,48 +98,62 @@ endpoints host =
 forceMaybe :: String -> Maybe a -> a
 forceMaybe errorMsg = fromMaybe (error errorMsg)
 
-getNextEvent' :: (FromJSON e, MonadIO m, MonadLogger m) => Endpoints -> Session -> m (Event e)
-getNextEvent' Endpoints{..} session = do
-  response <- liftIO $ S.get session nextURL
+getNextEvent' ::
+  (HttpResponse a ByteString, FromJSON e, MonadIO m, MonadLogger m) =>
+  Endpoints -> HttpClient a -> m (Event e)
+getNextEvent' Endpoints{..} HttpClient{..} = do
+  response <- liftIO $ get nextURL
   setTraceID response
   eventID  <- parseEventID response
   let eventBody = parseEvent response
   pure $ Event eventID eventBody
 
-setTraceID :: (MonadIO m, MonadLogger m) => Response ByteString -> m ()
+setTraceID ::
+  (HttpResponse a ByteString, MonadIO m, MonadLogger m) =>
+  a -> m ()
 setTraceID response = do
   let
     traceEnv = "_X_AMZN_TRACE_ID"
-    traceID  = fmap B.unpack $ response ^? responseHeader "Lambda-Runtime-Trace-Id"
+    traceID  = response ^? responseHeader "Lambda-Runtime-Trace-Id" <&> B.unpack
     errorMsg = "Missing response header \"Lambda-Runtime-Trace-Id\"."
   unless (isJust traceID) ($(logError) errorMsg)
   case traceID of
     Just traceID' -> liftIO $ setEnv traceEnv traceID'
     Nothing       -> liftIO $ unsetEnv traceEnv
 
-parseEventID :: (MonadIO m, MonadLogger m) => Response ByteString -> m EventID
+parseEventID ::
+  (HttpResponse a ByteString, MonadIO m, MonadLogger m) =>
+  a -> m EventID
 parseEventID response = do
   let
     errorMsg = "Missing required response header \"Lambda-Runtime-Aws-Request-Id\"."
-    eventID  = fmap (EventID . B.unpack) (response ^? responseHeader "Lambda-Runtime-Aws-Request-Id")
+    eventID  = response ^? responseHeader "Lambda-Runtime-Aws-Request-Id" <&> EventID . B.unpack
   unless (isJust eventID) ($(logErrorSH) errorMsg)
   pure $ forceMaybe errorMsg eventID
 
-parseEvent :: (FromJSON e) => Response ByteString -> Either ErrorMessage e
+parseEvent ::
+  (HttpResponse a ByteString, FromJSON e) =>
+  a -> Either ErrorMessage e
 parseEvent = eitherDecode . (^. responseBody)
 
-postResponse' :: (ToJSON r, MonadIO m, MonadLogger m) => Endpoints -> Session -> EventID -> r -> m ()
-postResponse' Endpoints{..} session (EventID eventID) response =
-  void . liftIO $ S.post session responseURL (encode response)
+postResponse' ::
+  (HttpResponse a ByteString, ToJSON r, MonadIO m, MonadLogger m) =>
+  Endpoints -> HttpClient a -> EventID -> r -> m ()
+postResponse' Endpoints{..} HttpClient{..} (EventID eventID) response =
+  void . liftIO $ post responseURL (toEncoding response)
   where responseURL = baseURL <> "/invocation/" <> eventID <> "/response"
 
-postError' :: (MonadIO m, MonadLogger m) => Endpoints -> Session -> EventID -> Error -> m ()
-postError' Endpoints{..} session (EventID eventID) error' =
-  void . liftIO $ S.post session errorURL (encode error')
+postError' ::
+  (HttpResponse a ByteString, MonadIO m, MonadLogger m) =>
+  Endpoints -> HttpClient a -> EventID -> Error -> m ()
+postError' Endpoints{..} HttpClient{..} (EventID eventID) error' =
+  void . liftIO $ post errorURL (toEncoding error')
   where errorURL = baseURL <> "/invocation/" <> eventID <> "/error"
 
-postInitError' :: (MonadIO m, MonadLogger m) => Endpoints -> Session -> Error -> m ()
-postInitError' Endpoints{..} session error' =
-  void . liftIO $ S.post session errorURL (encode error')
+postInitError' ::
+  (HttpResponse a ByteString, MonadIO m, MonadLogger m) =>
+  Endpoints -> HttpClient a -> Error -> m ()
+postInitError' Endpoints{..} HttpClient{..} error' =
+  void . liftIO $ post errorURL (toEncoding error')
   where errorURL = baseURL <> "/init/error"
 

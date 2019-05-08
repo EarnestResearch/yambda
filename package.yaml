@@ -17,6 +17,7 @@ dependencies:
 - base >= 4.7 && < 5
 - bytestring
 - http-client
+- http-types
 - lens
 - monad-logger
 - mtl
@@ -86,3 +87,4 @@ tests:
     - aws-lambda-haskell-runtime-client
     - HUnit
     - hspec
+    - keys
