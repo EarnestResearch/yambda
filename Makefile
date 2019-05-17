@@ -55,8 +55,8 @@ deploy: upload ## deploy lambda to AWS using SAM CLI
 		--stack-name aws-lambda-haskell-runtime-${NAME} \
 		--capabilities CAPABILITY_IAM
 
-.PHONY: lint
-lint: ## run linter
+.PHONY: linted
+linted: ## run linter
 	hlint examples src test
 
 .PHONY: stylish
