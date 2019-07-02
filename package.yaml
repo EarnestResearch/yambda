@@ -3,8 +3,10 @@ version:             0.1.0.0
 github:              "EarnestResearch/aws-lambda-haskell-runtime-client"
 license:             MIT
 author:              "Louis Vera"
-maintainer:          "lvera@earnestresearch.com"
+maintainer:          "dcq-team@earnestresearch.com"
 copyright:           "Earnest Research 2019"
+category:            AWS
+synopsis:            AWS Lambda Haskell Runtime Client
 
 extra-source-files:
 - README.md
@@ -13,18 +15,18 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme>
 
 dependencies:
-- aeson
-- base >= 4.7 && < 5
-- bytestring
-- http-client
-- http-types
-- lens
-- monad-logger
-- mtl
-- text
-- transformers
-- unordered-containers
-- wreq
+- aeson                             >= 1.4.2 && < 1.5
+- base                              >= 4.7 && < 5
+- bytestring                        >= 0.10.8 && < 0.11
+- text                              >= 1.2.3 && < 1.3
+- transformers                      >= 0.5.6 && < 0.6
+- unordered-containers              >= 0.2.10 && < 0.3
+- http-client                       >= 0.5.14 && < 0.6
+- mtl                               >= 2.2.2 && < 2.3
+- http-types                        >= 0.12.3 && < 0.13
+- lens                              >= 4.17.1 && < 4.18
+- monad-logger                      >= 0.3.30 && < 0.4
+- wreq                              >= 0.5.3 && < 0.6
 
 library:
   source-dirs: src
@@ -35,7 +37,6 @@ executables:
     source-dirs:         examples/api-gateway
     ghc-options:
     - -Wall
-    - -Werror
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
@@ -55,7 +56,6 @@ executables:
     source-dirs:         examples/s3
     ghc-options:
     - -Wall
-    - -Werror
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
@@ -66,7 +66,6 @@ executables:
     source-dirs:         examples/sns
     ghc-options:
     - -Wall
-    - -Werror
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
@@ -79,12 +78,11 @@ tests:
     source-dirs:         test
     ghc-options:
     - -Wall
-    - -Werror
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
     - aws-lambda-haskell-runtime-client
-    - HUnit
-    - hspec
-    - keys
+    - HUnit                 >= 1.6.0.0 && < 1.7
+    - hspec                 >= 2.6.1 && < 2.7
+    - keys                  >= 3.12.2 && < 3.13
