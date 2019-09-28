@@ -1,0 +1,191 @@
+cabal-version: 1.12
+
+name:           aws-lambda-haskell-runtime-client
+version:        0.1.0.0
+synopsis:       AWS Lambda Haskell Runtime Client
+description:    Please see the README on GitHub at <https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme>
+category:       AWS
+homepage:       https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme
+bug-reports:    https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client/issues
+author:         Louis Vera
+maintainer:     dcq-team@earnestresearch.com
+copyright:      Earnest Research 2019
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client
+
+flag static
+  description: Static build
+  manual: True
+  default: False
+
+library
+  exposed-modules:
+      AWS.Lambda.APIGatewayInputEvent
+      AWS.Lambda.APIGatewayOutputEvent
+      AWS.Lambda.HttpClient
+      AWS.Lambda.KinesisDataStreamsEvent
+      AWS.Lambda.RuntimeClient
+      AWS.Lambda.S3Event
+      AWS.Lambda.SNSEvent
+  other-modules:
+      Paths_aws_lambda_haskell_runtime_client
+  hs-source-dirs:
+      src
+  build-depends:
+      aeson >=1.4.2 && <1.5
+    , base >=4.7 && <5
+    , bytestring >=0.10.8 && <0.11
+    , http-client >=0.5.14 && <0.7
+    , http-types >=0.12.3 && <0.13
+    , lens >=4.17.1 && <4.18
+    , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
+    , text >=1.2.3 && <1.3
+    , transformers >=0.5.6 && <0.6
+    , unordered-containers >=0.2.10 && <0.3
+    , wreq >=0.5.3 && <0.6
+  default-language: Haskell2010
+
+executable api-gateway-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_aws_lambda_haskell_runtime_client
+  hs-source-dirs:
+      examples/api-gateway
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson >=1.4.2 && <1.5
+    , aws-lambda-haskell-runtime-client
+    , base >=4.7 && <5
+    , bytestring >=0.10.8 && <0.11
+    , http-client >=0.5.14 && <0.7
+    , http-types >=0.12.3 && <0.13
+    , lens >=4.17.1 && <4.18
+    , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
+    , text >=1.2.3 && <1.3
+    , transformers >=0.5.6 && <0.6
+    , unordered-containers >=0.2.10 && <0.3
+    , wreq >=0.5.3 && <0.6
+  if flag(static)
+    cc-options: -static
+    ld-options: -static -pthread
+  default-language: Haskell2010
+
+executable kinesis-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_aws_lambda_haskell_runtime_client
+  hs-source-dirs:
+      examples/kinesis
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson >=1.4.2 && <1.5
+    , aws-lambda-haskell-runtime-client
+    , base >=4.7 && <5
+    , bytestring >=0.10.8 && <0.11
+    , http-client >=0.5.14 && <0.7
+    , http-types >=0.12.3 && <0.13
+    , lens >=4.17.1 && <4.18
+    , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
+    , text >=1.2.3 && <1.3
+    , transformers >=0.5.6 && <0.6
+    , unordered-containers >=0.2.10 && <0.3
+    , wreq >=0.5.3 && <0.6
+  if flag(static)
+    cc-options: -static
+    ld-options: -static -pthread
+  default-language: Haskell2010
+
+executable s3-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_aws_lambda_haskell_runtime_client
+  hs-source-dirs:
+      examples/s3
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson >=1.4.2 && <1.5
+    , aws-lambda-haskell-runtime-client
+    , base >=4.7 && <5
+    , bytestring >=0.10.8 && <0.11
+    , http-client >=0.5.14 && <0.7
+    , http-types >=0.12.3 && <0.13
+    , lens >=4.17.1 && <4.18
+    , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
+    , text >=1.2.3 && <1.3
+    , transformers >=0.5.6 && <0.6
+    , unordered-containers >=0.2.10 && <0.3
+    , wreq >=0.5.3 && <0.6
+  if flag(static)
+    cc-options: -static
+    ld-options: -static -pthread
+  default-language: Haskell2010
+
+executable sns-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_aws_lambda_haskell_runtime_client
+  hs-source-dirs:
+      examples/sns
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson >=1.4.2 && <1.5
+    , aws-lambda-haskell-runtime-client
+    , base >=4.7 && <5
+    , bytestring >=0.10.8 && <0.11
+    , http-client >=0.5.14 && <0.7
+    , http-types >=0.12.3 && <0.13
+    , lens >=4.17.1 && <4.18
+    , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
+    , text >=1.2.3 && <1.3
+    , transformers >=0.5.6 && <0.6
+    , unordered-containers >=0.2.10 && <0.3
+    , wreq >=0.5.3 && <0.6
+  if flag(static)
+    cc-options: -static
+    ld-options: -static -pthread
+  default-language: Haskell2010
+
+test-suite aws-lambda-haskell-runtime-client-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      AWS.Lambda.KinesisDataStreamsEventSpec
+      AWS.Lambda.KinesisSpec
+      AWS.Lambda.RuntimeClientSpec
+      AWS.Lambda.S3EventSpec
+      AWS.Lambda.TestHttpClient
+      Paths_aws_lambda_haskell_runtime_client
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HUnit >=1.6.0.0 && <1.7
+    , aeson >=1.4.2 && <1.5
+    , aws-lambda-haskell-runtime-client
+    , base >=4.7 && <5
+    , bytestring >=0.10.8 && <0.11
+    , hspec >=2.6.1 && <2.8
+    , http-client >=0.5.14 && <0.7
+    , http-types >=0.12.3 && <0.13
+    , keys >=3.12.2 && <3.13
+    , lens >=4.17.1 && <4.18
+    , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
+    , text >=1.2.3 && <1.3
+    , transformers >=0.5.6 && <0.6
+    , unordered-containers >=0.2.10 && <0.3
+    , wreq >=0.5.3 && <0.6
+  default-language: Haskell2010

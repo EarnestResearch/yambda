@@ -16,7 +16,6 @@
 *.o
 *.prof
 *~
-aws-lambda-haskell-runtime-client.cabal
 cabal-dev
 cabal.project.local
 cabal.project.local~
