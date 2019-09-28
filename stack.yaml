@@ -1,9 +1,8 @@
-resolver: lts-13.26
+resolver: lts-14.7
 
 packages:
 - .
 
 docker:
   enable: true
-  repo: earnestresearch/aws-lambda-haskell-platform:lts-13.26
-  stack-exe: image
+
