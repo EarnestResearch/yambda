@@ -31,6 +31,7 @@ library
       AWS.Lambda.APIGatewayInputEvent
       AWS.Lambda.APIGatewayOutputEvent
       AWS.Lambda.HttpClient
+      AWS.Lambda.JsonHandler
       AWS.Lambda.KinesisDataStreamsEvent
       AWS.Lambda.RuntimeClient
       AWS.Lambda.S3Event
@@ -41,6 +42,7 @@ library
       src
   build-depends:
       aeson >=1.4.2 && <1.5
+    , attoparsec >= 0.13.2.3 && < 0.14
     , base >=4.7 && <5
     , bytestring >=0.10.8 && <0.11
     , http-client >=0.5.14 && <0.7
@@ -174,6 +176,7 @@ test-suite aws-lambda-haskell-runtime-client-test
   build-depends:
       HUnit >=1.6.0.0 && <1.7
     , aeson >=1.4.2 && <1.5
+    , attoparsec >= 0.13.2.3 && < 0.14
     , aws-lambda-haskell-runtime-client
     , base >=4.7 && <5
     , bytestring >=0.10.8 && <0.11
