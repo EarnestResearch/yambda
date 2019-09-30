@@ -9,7 +9,7 @@ Examples of how to use this client can be found in the `examples` directory.
 ## Creating a lambda based on this library
 To create a lambda that is based on this library, using `stack`:
 
-1. Add it to your extra-deps this repository
+1. Add this repository to your extra-deps
 ```yaml
 extra-deps:
   - github: EarnestResearch/aws-lambda-haskell-runtime-client
