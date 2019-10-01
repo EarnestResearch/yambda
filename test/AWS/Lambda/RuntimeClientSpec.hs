@@ -13,6 +13,7 @@ import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Logger
 import Data.Aeson hiding (Error)
+import Data.ByteString.Char8 (pack)
 import Data.HashMap.Strict as MAP
 import Data.Key
 import Data.Text (Text)
@@ -49,31 +50,31 @@ withRuntimeEnvVars = bracket_ setEnvVars unsetEnvVars
 
 testSetsTraceId :: Expectation
 testSetsTraceId = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   traceId <- liftIO $ lookupEnv "_X_AMZN_TRACE_ID"
   liftIO $ traceId `shouldBe` Just "67890"
   where
-    runtimeClientWith' = runtimeClientWith @_ @Text @Text
-    httpClient = defaultTestHttpClient @Text "Hello, world"
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
+    httpClient = defaultTestHttpClient ("Hello, world" :: Text)
 
 testReturnsEventId :: Expectation
 testReturnsEventId = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   liftIO $ show eventID `shouldBe` "EventID \"12345\""
   where
-    runtimeClientWith' = runtimeClientWith @_ @Text @Text
-    httpClient = defaultTestHttpClient @Text "Hello, world"
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
+    httpClient = defaultTestHttpClient ("Hello, world" :: Text)
 
 testReturnsEvent :: Expectation
 testReturnsEvent = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   liftIO $ eventBody `shouldBe` Right "Hello, world"
   where
-    runtimeClientWith' = runtimeClientWith @_ @Text @Text
-    httpClient = defaultTestHttpClient @Text "Hello, world"
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
+    httpClient = defaultTestHttpClient ("Hello, world" :: Text)
 
 withGetUrl :: HttpClient a -> String -> HttpClient a
 withGetUrl (HttpClient get' post') url =
@@ -81,10 +82,10 @@ withGetUrl (HttpClient get' post') url =
 
 testGetUrl :: Expectation
 testGetUrl = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   void getNextEvent
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient =
       defaultTestHttpClient Null
         `withGetUrl` "http://example.com/2018-06-01/runtime/invocation/next"
@@ -94,69 +95,69 @@ withPostUrl (HttpClient get' post') url = HttpClient get' (\x y -> shouldBe x ur
 
 testPostResponseUrl :: Expectation
 testPostResponseUrl = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
-  void $ postResponse eventID Null
+  void $ postResponse eventID ""
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient =
       defaultTestHttpClient Null
         `withPostUrl` "http://example.com/2018-06-01/runtime/invocation/12345/response"
 
 testPostErrorUrl :: Expectation
 testPostErrorUrl = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   void $ postError eventID $ Error "Test" "Test"
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient =
       defaultTestHttpClient Null
         `withPostUrl` "http://example.com/2018-06-01/runtime/invocation/12345/error"
 
 testPostInitErrorUrl :: Expectation
 testPostInitErrorUrl = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   void . postInitError $ Error "Test" "Test"
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient =
       defaultTestHttpClient Null
         `withPostUrl` "http://example.com/2018-06-01/runtime/init/error"
 
-withPostBody :: (ToJSON b) => HttpClient a -> b -> HttpClient a
+withPostBody :: (Show b) => HttpClient a -> b -> HttpClient a
 withPostBody (HttpClient get' post') b = HttpClient get' (\x y -> shouldBe y body' >> post' x y)
-  where body' = toEncoding b
+  where body' = pack . show $ b
 
 testPostResponseBody :: Expectation
 testPostResponseBody = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   void $ postResponse eventID body'
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Text
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient = defaultTestHttpClient Null `withPostBody` body'
     body' :: Text
     body' = "Hello, World"
 
 testPostErrorBody :: Expectation
 testPostErrorBody = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   void $ postError eventID error'
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient = defaultTestHttpClient Null `withPostBody` error'
     error' = Error "Test" "Hello, World"
 
 testPostInitErrorBody :: Expectation
 testPostInitErrorBody = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   void $ postInitError error'
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient = defaultTestHttpClient Null `withPostBody` error'
     error' = Error "Test" "Hello, World"
 

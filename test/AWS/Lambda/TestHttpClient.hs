@@ -7,9 +7,9 @@ module AWS.Lambda.TestHttpClient where
 
 import           AWS.Lambda.HttpClient
 import           Control.Lens
-import           Data.Aeson
 import qualified Data.ByteString as SB
-import qualified Data.ByteString.Lazy.Internal as LIB
+import qualified Data.ByteString.Lazy as LB
+import qualified Data.ByteString.Lazy.Char8 as LBC
 import qualified Data.HashMap.Strict as MAP
 import           Network.HTTP.Types
 
@@ -24,7 +24,7 @@ data TestHttpResponse a =
 
 makeLenses ''TestHttpResponse
 
-instance HttpResponse (TestHttpResponse LIB.ByteString) LIB.ByteString where
+instance HttpResponse (TestHttpResponse LB.ByteString) LB.ByteString where
   responseHeader name = headers . at name . non ""
   responseBody = body
 
@@ -35,12 +35,12 @@ defaultHeaders =
     , ("Lambda-Runtime-Trace-Id", "67890")
     ]
 
-emptyResponse :: TestHttpResponse LIB.ByteString
+emptyResponse :: TestHttpResponse LB.ByteString
 emptyResponse = TestHttpResponse defaultHeaders ""
 
-defaultTestHttpClient :: (ToJSON e) => e -> HttpClient (TestHttpResponse LIB.ByteString)
+defaultTestHttpClient :: (Show e) => e -> HttpClient (TestHttpResponse LB.ByteString)
 defaultTestHttpClient nextEvent = HttpClient get' post'
   where
-    get' _ = pure $ emptyResponse & body .~ encode nextEvent
+    get' _ = pure $ emptyResponse & body .~ (LBC.pack . show $ nextEvent)
     post' _ _ = pure emptyResponse
 
