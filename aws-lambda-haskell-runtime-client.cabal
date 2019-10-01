@@ -32,6 +32,7 @@ library
       AWS.Lambda.APIGatewayOutputEvent
       AWS.Lambda.HttpClient
       AWS.Lambda.JsonHandler
+      AWS.Lambda.DhallHandler
       AWS.Lambda.KinesisDataStreamsEvent
       AWS.Lambda.RuntimeClient
       AWS.Lambda.S3Event
@@ -44,6 +45,7 @@ library
       aeson >=1.4.2 && <1.5
     , base >=4.7 && <5
     , bytestring >=0.10.8 && <0.11
+    , dhall >= 1.26.1 && < 1.27
     , http-client >=0.5.14 && <0.7
     , http-types >=0.12.3 && <0.13
     , lens >=4.17.1 && <4.18
@@ -67,6 +69,33 @@ executable api-gateway-exe
     , aws-lambda-haskell-runtime-client
     , base >=4.7 && <5
     , bytestring >=0.10.8 && <0.11
+    , http-client >=0.5.14 && <0.7
+    , http-types >=0.12.3 && <0.13
+    , lens >=4.17.1 && <4.18
+    , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
+    , text >=1.2.3 && <1.3
+    , transformers >=0.5.6 && <0.6
+    , unordered-containers >=0.2.10 && <0.3
+    , wreq >=0.5.3 && <0.6
+  if flag(static)
+    cc-options: -static
+    ld-options: -static -pthread
+  default-language: Haskell2010
+
+executable dhall-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_aws_lambda_haskell_runtime_client
+  hs-source-dirs:
+      examples/dhall
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson >=1.4.2 && <1.5
+    , aws-lambda-haskell-runtime-client
+    , base >=4.7 && <5
+    , bytestring >=0.10.8 && <0.11
+    , dhall >= 1.26.1 && < 1.27
     , http-client >=0.5.14 && <0.7
     , http-types >=0.12.3 && <0.13
     , lens >=4.17.1 && <4.18
