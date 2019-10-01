@@ -13,14 +13,10 @@ import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Logger
 import Data.Aeson hiding (Error)
-import qualified Data.Aeson.Parser as AP
-import qualified Data.Attoparsec.ByteString as P
 import Data.ByteString.Char8 (pack)
-import qualified Data.ByteString.Char8 as BS
 import Data.HashMap.Strict as MAP
 import Data.Key
 import Data.Text (Text)
-import qualified Data.Text as T
 import System.Environment
 import Test.Hspec
 
@@ -54,31 +50,31 @@ withRuntimeEnvVars = bracket_ setEnvVars unsetEnvVars
 
 testSetsTraceId :: Expectation
 testSetsTraceId = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' AP.jstring httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   traceId <- liftIO $ lookupEnv "_X_AMZN_TRACE_ID"
   liftIO $ traceId `shouldBe` Just "67890"
   where
     runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
-    httpClient = defaultTestHttpClient "Hello, world"
+    httpClient = defaultTestHttpClient ("Hello, world" :: Text)
 
 testReturnsEventId :: Expectation
 testReturnsEventId = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' AP.jstring httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   liftIO $ show eventID `shouldBe` "EventID \"12345\""
   where
     runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
-    httpClient = defaultTestHttpClient "Hello, world"
+    httpClient = defaultTestHttpClient ("Hello, world" :: Text)
 
 testReturnsEvent :: Expectation
 testReturnsEvent = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' AP.jstring httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
-  liftIO $ P.compareResults eventBody (P.Done (BS.pack "") (T.pack "Hello, world"))`shouldBe` Just True 
+  liftIO $ eventBody `shouldBe` Right "Hello, world"
   where
     runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
-    httpClient = defaultTestHttpClient "Hello, world"
+    httpClient = defaultTestHttpClient ("Hello, world" :: Text)
 
 withGetUrl :: HttpClient a -> String -> HttpClient a
 withGetUrl (HttpClient get' post') url =
@@ -86,7 +82,7 @@ withGetUrl (HttpClient get' post') url =
 
 testGetUrl :: Expectation
 testGetUrl = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' AP.jstring httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   void getNextEvent
   where
     runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
@@ -99,7 +95,7 @@ withPostUrl (HttpClient get' post') url = HttpClient get' (\x y -> shouldBe x ur
 
 testPostResponseUrl :: Expectation
 testPostResponseUrl = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' AP.jstring httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   void $ postResponse eventID ""
   where
@@ -110,7 +106,7 @@ testPostResponseUrl = runNoLoggingT $ do
 
 testPostErrorUrl :: Expectation
 testPostErrorUrl = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' AP.jstring httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   void $ postError eventID $ Error "Test" "Test"
   where
@@ -121,7 +117,7 @@ testPostErrorUrl = runNoLoggingT $ do
 
 testPostInitErrorUrl :: Expectation
 testPostInitErrorUrl = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' AP.jstring httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   void . postInitError $ Error "Test" "Test"
   where
@@ -136,7 +132,7 @@ withPostBody (HttpClient get' post') b = HttpClient get' (\x y -> shouldBe y bod
 
 testPostResponseBody :: Expectation
 testPostResponseBody = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' AP.jstring httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   void $ postResponse eventID body'
   where
@@ -147,7 +143,7 @@ testPostResponseBody = runNoLoggingT $ do
 
 testPostErrorBody :: Expectation
 testPostErrorBody = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' AP.jstring httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   void $ postError eventID error'
   where
@@ -157,7 +153,7 @@ testPostErrorBody = runNoLoggingT $ do
 
 testPostInitErrorBody :: Expectation
 testPostInitErrorBody = runNoLoggingT $ do
-  RuntimeClient{..} <- runtimeClientWith' AP.jstring httpClient
+  RuntimeClient{..} <- runtimeClientWith' eitherDecode httpClient
   Event{..} <- getNextEvent
   void $ postInitError error'
   where

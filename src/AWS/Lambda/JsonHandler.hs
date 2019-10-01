@@ -11,13 +11,14 @@ import qualified Data.Aeson as A
 import Data.Attoparsec.ByteString
 import Data.Text
 
-jsonHandler :: (MonadIO m, MonadLogger m, A.FromJSON e, Show r) => (e -> r) -> m ()
-jsonHandler f = do
-  RuntimeClient{..} <- runtimeClient A.json
+jsonHandler :: (MonadIO m, MonadLogger m, A.FromJSON e, Show e, Show r) => (e -> r) -> m ()
+jsonHandler f = forever $ do
+  client <- runtimeClient A.eitherDecode
+  forever $ handle client f
+
+handle :: (MonadIO m, MonadLogger m, A.FromJSON e, Show e, Show r) => RuntimeClient e r m -> (e -> r) -> m ()
+handle RuntimeClient{..} f = do
   event@Event{..} <- getNextEvent
   case eventBody of
-    Done _ e -> case A.fromJSON e of
-      A.Success e -> postResponse eventID (f e)
-      A.Error e -> postError eventID (Error "Parse failure" $ pack e)
-    Partial _ -> postError eventID (Error "Parse failure" $ "Partial")
-    Fail _ _ e ->  postError eventID (Error "Parse failure" $ pack e)
+    Right val -> postResponse eventID (f val)
+    Left e -> postError eventID (Error "Parse failure" $ pack e)
