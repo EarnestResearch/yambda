@@ -1,7 +1,7 @@
 {- HLINT ignore "Reduce duplication" -}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE TypeApplications   #-}
+{-# LANGUAGE TypeApplications  #-}
 
 module AWS.Lambda.RuntimeClientSpec where
 

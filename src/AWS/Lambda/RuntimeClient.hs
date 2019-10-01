@@ -49,14 +49,14 @@ data Error =
 
 data RuntimeClient e r m =
   RuntimeClient {
-    getNextEvent :: (MonadIO m, MonadLogger m) => m (Event e)
-  , postResponse :: (MonadIO m, MonadLogger m) => EventID -> r -> m ()
-  , postError :: (MonadIO m, MonadLogger m) => EventID -> Error -> m ()
+    getNextEvent  :: (MonadIO m, MonadLogger m) => m (Event e)
+  , postResponse  :: (MonadIO m, MonadLogger m) => EventID -> r -> m ()
+  , postError     :: (MonadIO m, MonadLogger m) => EventID -> Error -> m ()
   , postInitError :: (MonadIO m, MonadLogger m) => Error -> m ()
   }
 
 runtimeClient ::
-  (MonadLogger m, MonadIO m, Show r) => Decode e -> 
+  (MonadLogger m, MonadIO m, Show r) => Decode e ->
   m (RuntimeClient e r m)
 runtimeClient decode = runtimeClientWith decode =<< liftIO defaultHttpClient
 

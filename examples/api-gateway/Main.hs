@@ -1,11 +1,10 @@
-{-# LANGUAGE RecordWildCards   #-}
 module Main where
 
-import AWS.Lambda.JsonHandler
 import AWS.Lambda.APIGatewayInputEvent
 import AWS.Lambda.APIGatewayOutputEvent hiding (body)
-import Control.Monad.Logger
+import AWS.Lambda.JsonHandler
 import Control.Lens
+import Control.Monad.Logger
 
 main :: IO ()
 main = runStderrLoggingT $ jsonHandler echo
