@@ -75,7 +75,7 @@ testReturnsEvent :: Expectation
 testReturnsEvent = runNoLoggingT $ do
   RuntimeClient{..} <- runtimeClientWith' AP.jstring httpClient
   Event{..} <- getNextEvent
-  liftIO $ P.compareResults eventBody (P.Done (BS.pack "Hello, world") (T.pack "Hello, world"))`shouldBe` Just True 
+  liftIO $ P.compareResults eventBody (P.Done (BS.pack "") (T.pack "Hello, world"))`shouldBe` Just True 
   where
     runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient = defaultTestHttpClient "Hello, world"

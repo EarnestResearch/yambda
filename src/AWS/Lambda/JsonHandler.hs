@@ -19,3 +19,5 @@ jsonHandler f = do
     Done _ e -> case A.fromJSON e of
       A.Success e -> postResponse eventID (f e)
       A.Error e -> postError eventID (Error "Parse failure" $ pack e)
+    Partial _ -> postError eventID (Error "Parse failure" $ "Partial")
+    Fail _ _ e ->  postError eventID (Error "Parse failure" $ pack e)
