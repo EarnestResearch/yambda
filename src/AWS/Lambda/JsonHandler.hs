@@ -12,7 +12,7 @@ import           Data.Text
 
 jsonHandler :: (MonadIO m, MonadLogger m, A.FromJSON e, Show e, Show r) => (e -> r) -> m ()
 jsonHandler f = forever $ do
-  client <- runtimeClient A.eitherDecode
+  client <- runtimeClient (pure . A.eitherDecode)
   forever $ handle client f
 
 handle :: (MonadIO m, MonadLogger m, A.FromJSON e, Show e, Show r) => RuntimeClient e r m -> (e -> r) -> m ()
