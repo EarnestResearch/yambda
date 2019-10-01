@@ -20,8 +20,6 @@ import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Logger
-import qualified Data.Aeson as A
-import           Data.Attoparsec.ByteString
 import qualified Data.ByteString.Char8 as B
 import           Data.ByteString.Lazy as LB
 import           Data.Maybe

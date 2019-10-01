@@ -8,7 +8,6 @@ import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Logger
 import qualified Data.Aeson as A
-import Data.Attoparsec.ByteString
 import Data.Text
 
 jsonHandler :: (MonadIO m, MonadLogger m, A.FromJSON e, Show e, Show r) => (e -> r) -> m ()
