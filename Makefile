@@ -1,5 +1,5 @@
 BUILD_DIR = build
-EXAMPLES  = api-gateway kinesis s3 sns
+EXAMPLES  = api-gateway kinesis s3 sns dhall
 
 .PHONY: build
 build: ## compile and test
@@ -22,6 +22,7 @@ sam-tests: sam-template-all package-all ## compile, test, and invoke each exampl
 		sam local invoke "S3Echo" -t build/s3.yaml
 	sam local generate-event sns notification | \
 		sam local invoke "SNSEcho" -t build/sns.yaml
+	sam local invoke "DhallEcho" -t build/dhall.yaml -e events/example.dhall
 
 .PHONY: package-all
 package-all: build
