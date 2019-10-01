@@ -10,7 +10,7 @@ module AWS.Lambda.HttpClient where
 import           Control.Lens
 import           Data.Aeson
 import qualified Data.ByteString as SB
-import qualified Data.ByteString.Lazy.Internal as LIB
+import qualified Data.ByteString.Lazy as LB
 import qualified Network.HTTP.Client as C
 import           Network.HTTP.Types (HeaderName)
 import qualified Network.Wreq as W
@@ -26,11 +26,11 @@ instance HttpResponse (W.Response body) body where
 
 data HttpClient a =
   HttpClient {
-    get  :: (HttpResponse a LIB.ByteString) => String -> IO a
-  , post :: (HttpResponse a LIB.ByteString) => String -> Encoding -> IO a
+    get  :: (HttpResponse a LB.ByteString) => String -> IO a
+  , post :: (HttpResponse a LB.ByteString) => String -> SB.ByteString -> IO a
   }
 
-defaultHttpClient :: IO (HttpClient (W.Response LIB.ByteString))
+defaultHttpClient :: IO (HttpClient (W.Response LB.ByteString))
 defaultHttpClient = do
   session <- S.newSessionControl Nothing settings
   pure $ HttpClient (S.get session) (S.post session)

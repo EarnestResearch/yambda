@@ -20,9 +20,8 @@ import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Logger
-import           Data.Aeson hiding (Error)
 import qualified Data.ByteString.Char8 as B
-import           Data.ByteString.Lazy.Internal
+import           Data.ByteString.Lazy as LB
 import           Data.Maybe
 import           Data.Text (Text)
 import           GHC.Generics
@@ -30,11 +29,12 @@ import           System.Environment
 
 newtype EventID = EventID String deriving (Show)
 type ErrorMessage = String
+type Decode e = LB.ByteString -> Either String e
 
 data Event a =
   Event {
     eventID   :: EventID
-  , eventBody :: Either ErrorMessage a
+  , eventBody :: Either String a
   } deriving (
     Show
   )
@@ -45,34 +45,31 @@ data Error =
   , errorMessage :: Text
   } deriving (
     Show
-  , Generic
   )
-
-instance ToJSON Error
 
 data RuntimeClient e r m =
   RuntimeClient {
-    getNextEvent :: (FromJSON e, MonadIO m, MonadLogger m) => m (Event e)
-  , postResponse :: (ToJSON r, MonadIO m, MonadLogger m) => EventID -> r -> m ()
-  , postError :: (MonadIO m, MonadLogger m) => EventID -> Error -> m ()
+    getNextEvent  :: (MonadIO m, MonadLogger m) => m (Event e)
+  , postResponse  :: (MonadIO m, MonadLogger m) => EventID -> r -> m ()
+  , postError     :: (MonadIO m, MonadLogger m) => EventID -> Error -> m ()
   , postInitError :: (MonadIO m, MonadLogger m) => Error -> m ()
   }
 
 runtimeClient ::
-  (FromJSON e, ToJSON r, MonadLogger m, MonadIO m) =>
+  (MonadLogger m, MonadIO m, Show r) => Decode e ->
   m (RuntimeClient e r m)
-runtimeClient = runtimeClientWith =<< liftIO defaultHttpClient
+runtimeClient decode = runtimeClientWith decode =<< liftIO defaultHttpClient
 
 runtimeClientWith ::
-  (HttpResponse a ByteString, FromJSON e, ToJSON r, MonadLogger m, MonadIO m) =>
-  HttpClient a -> m (RuntimeClient e r m)
-runtimeClientWith httpClient = do
+  (HttpResponse a ByteString, MonadLogger m, MonadIO m, Show r) =>
+  Decode e -> HttpClient a -> m (RuntimeClient e r m)
+runtimeClientWith decode httpClient = do
   runtimeHost <- liftIO $ lookupEnv runtimeHostEnv
   unless (isJust runtimeHost) ($(logErrorSH) errorMsg)
   let endpoints' = endpoints $ forceMaybe errorMsg runtimeHost
   pure $
     RuntimeClient {
-      getNextEvent  = getNextEvent'  endpoints' httpClient
+      getNextEvent  = getNextEvent'  endpoints' httpClient decode
     , postResponse  = postResponse'  endpoints' httpClient
     , postError     = postError'     endpoints' httpClient
     , postInitError = postInitError' endpoints' httpClient
@@ -99,13 +96,13 @@ forceMaybe :: String -> Maybe a -> a
 forceMaybe errorMsg = fromMaybe (error errorMsg)
 
 getNextEvent' ::
-  (HttpResponse a ByteString, FromJSON e, MonadIO m, MonadLogger m) =>
-  Endpoints -> HttpClient a -> m (Event e)
-getNextEvent' Endpoints{..} HttpClient{..} = do
+  (HttpResponse a ByteString, MonadIO m, MonadLogger m) =>
+  Endpoints -> HttpClient a -> Decode e -> m (Event e)
+getNextEvent' Endpoints{..} HttpClient{..} decode = do
   response <- liftIO $ get nextURL
   setTraceID response
   eventID  <- parseEventID response
-  let eventBody = parseEvent response
+  let eventBody = parseEvent decode response
   pure $ Event eventID eventBody
 
 setTraceID ::
@@ -132,28 +129,28 @@ parseEventID response = do
   pure $ forceMaybe errorMsg eventID
 
 parseEvent ::
-  (HttpResponse a ByteString, FromJSON e) =>
-  a -> Either ErrorMessage e
-parseEvent = eitherDecode . (^. responseBody)
+  (HttpResponse a ByteString) =>
+  Decode e -> a -> Either String e
+parseEvent decode response = decode (response ^. responseBody)
 
 postResponse' ::
-  (HttpResponse a ByteString, ToJSON r, MonadIO m, MonadLogger m) =>
+  (HttpResponse a ByteString, MonadIO m, MonadLogger m, Show r) =>
   Endpoints -> HttpClient a -> EventID -> r -> m ()
 postResponse' Endpoints{..} HttpClient{..} (EventID eventID) response =
-  void . liftIO $ post responseURL (toEncoding response)
+  void . liftIO $ post responseURL (B.pack . show $ response)
   where responseURL = baseURL <> "/invocation/" <> eventID <> "/response"
 
 postError' ::
   (HttpResponse a ByteString, MonadIO m, MonadLogger m) =>
   Endpoints -> HttpClient a -> EventID -> Error -> m ()
 postError' Endpoints{..} HttpClient{..} (EventID eventID) error' =
-  void . liftIO $ post errorURL (toEncoding error')
+  void . liftIO $ post errorURL (B.pack . show $ error')
   where errorURL = baseURL <> "/invocation/" <> eventID <> "/error"
 
 postInitError' ::
   (HttpResponse a ByteString, MonadIO m, MonadLogger m) =>
   Endpoints -> HttpClient a -> Error -> m ()
 postInitError' Endpoints{..} HttpClient{..} error' =
-  void . liftIO $ post errorURL (toEncoding error')
+  void . liftIO $ post errorURL (B.pack . show $ error')
   where errorURL = baseURL <> "/init/error"
 
