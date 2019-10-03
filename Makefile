@@ -58,7 +58,7 @@ deploy: upload ## deploy lambda to AWS using SAM CLI
 
 .PHONY: linted
 linted: ## run linter
-	hlint examples src test
+	hlint "--ignore=Parse error" examples src test
 
 .PHONY: stylish
 stylish: ## run stylish haskell code formatter

@@ -19,9 +19,7 @@ data User = User {
 } deriving (Generic, Show, ToJSON)
 
 deriving via (LambdaFromDhall User) instance (LambdaDecode User)
-deriving via (LambdaToJSON User) instance (LambdaEncode User) --TODO: replace once figured out how to encode a type to a dhall expr
-
-instance Interpret User
+deriving via (LambdaToDhall User) instance (LambdaEncode User)
 
 main :: IO ()
 main = runStderrLoggingT $ handler echo
