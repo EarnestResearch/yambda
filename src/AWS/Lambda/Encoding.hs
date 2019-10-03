@@ -34,10 +34,12 @@ instance A.ToJSON a => LambdaEncode (LambdaToJSON a) where
     encodeOutput = LB.toStrict . A.encode
 
 instance D.Interpret a => LambdaDecode (LambdaFromDhall a) where
-    decodeInput = fmap showLeft . try . D.input D.auto . LT.toStrict . LTE.decodeUtf8
+    decodeInput = fmap showLeft . try . D.input D.auto . LT.toStrict . LTE.decodeUtf8 . decodeText
         where
             showLeft :: Either IOException b -> Either String b
             showLeft = bimap show id  
+            decodeText :: LB.ByteString -> LB.ByteString
+            decodeText = either (LTE.encodeUtf8 . LT.pack) LTE.encodeUtf8 . A.eitherDecode
 
 instance D.Inject a => LambdaEncode (LambdaToDhall a) where
     encodeOutput = TE.encodeUtf8 . DC.pretty . D.embed D.inject
