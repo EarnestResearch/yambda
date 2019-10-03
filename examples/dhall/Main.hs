@@ -1,7 +1,7 @@
 {-#LANGUAGE DeriveGeneric #-}
 module Main where
 
-import AWS.Lambda.DhallHandler
+import AWS.Lambda.Handler
 import Control.Lens
 import Control.Monad.Logger
 import Dhall
@@ -15,7 +15,7 @@ data User = User {
 instance Interpret User
 
 main :: IO ()
-main = runStderrLoggingT $ dhallHandler echo
+main = runStderrLoggingT $ handler echo
 
 echo :: User -> User
 echo = id

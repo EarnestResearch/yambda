@@ -1,6 +1,8 @@
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DerivingVia #-}
+
 module AWS.Lambda.KinesisDataStreamsEvent where
 
 import Control.Lens
@@ -46,6 +48,8 @@ instance FromJSON Record where
 
 newtype KinesisDataStreamsEvent = KinesisDataStreamsEvent { _records :: [Record] }
   deriving (Eq, Generic, Show)
+  deriving LambdaEncode via (LambdaFromJSON KinesisDataStreamsEvent)
+  deriving LambdaDecode via (LambdaToJSON KinesisDataStreamsEvent)
 
 instance ToJSON KinesisDataStreamsEvent where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify' }

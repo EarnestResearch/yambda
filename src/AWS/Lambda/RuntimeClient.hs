@@ -29,7 +29,6 @@ import           System.Environment
 
 newtype EventID = EventID String deriving (Show)
 type ErrorMessage = String
-type Decode m e = LB.ByteString -> m (Either String e)
 
 data Event a =
   Event {
@@ -56,20 +55,19 @@ data RuntimeClient e r m =
   }
 
 runtimeClient ::
-  (MonadLogger m, MonadIO m, Show r) => Decode m e ->
-  m (RuntimeClient e r m)
-runtimeClient decode = runtimeClientWith decode =<< liftIO defaultHttpClient
+  (MonadLogger m, MonadIO m, Decode e, Encode r) => m (RuntimeClient e r m)
+runtimeClient = runtimeClientWith =<< liftIO defaultHttpClient
 
 runtimeClientWith ::
-  (HttpResponse a ByteString, MonadLogger m, MonadIO m, Show r) =>
-  Decode m e -> HttpClient a -> m (RuntimeClient e r m)
-runtimeClientWith decode httpClient = do
+  (HttpResponse a ByteString, MonadLogger m, MonadIO m, LambdaDecode e, LambdaEncode r) =>
+  HttpClient a -> m (RuntimeClient e r m)
+runtimeClientWith httpClient = do
   runtimeHost <- liftIO $ lookupEnv runtimeHostEnv
   unless (isJust runtimeHost) ($(logErrorSH) errorMsg)
   let endpoints' = endpoints $ forceMaybe errorMsg runtimeHost
   pure $
     RuntimeClient {
-      getNextEvent  = getNextEvent'  endpoints' httpClient decode
+      getNextEvent  = getNextEvent'  endpoints' httpClient
     , postResponse  = postResponse'  endpoints' httpClient
     , postError     = postError'     endpoints' httpClient
     , postInitError = postInitError' endpoints' httpClient
@@ -96,13 +94,13 @@ forceMaybe :: String -> Maybe a -> a
 forceMaybe errorMsg = fromMaybe (error errorMsg)
 
 getNextEvent' ::
-  (HttpResponse a ByteString, MonadIO m, MonadLogger m) =>
-  Endpoints -> HttpClient a -> Decode m e -> m (Event e)
+  (HttpResponse a ByteString, MonadIO m, MonadLogger m, LambdaDecode e) =>
+  Endpoints -> HttpClient a-> m (Event e)
 getNextEvent' Endpoints{..} HttpClient{..} decode = do
   response <- liftIO $ get nextURL
   setTraceID response
   eventID  <- parseEventID response 
-  eventBody <- parseEvent decode response
+  eventBody <- parseEvent response
   pure $ Event eventID eventBody
 
 setTraceID ::
@@ -129,15 +127,15 @@ parseEventID response = do
   pure $ forceMaybe errorMsg eventID
 
 parseEvent ::
-  (MonadIO m, MonadLogger m, HttpResponse a ByteString) =>
-  Decode m e -> a -> m (Either String e)
-parseEvent decode response = decode (response ^. responseBody)
+  (MonadIO m, MonadLogger m, HttpResponse a ByteString, LambdaDecode e) =>
+  a -> m (Either String e)
+parseEvent response = decodeInput (response ^. responseBody)
 
 postResponse' ::
-  (HttpResponse a ByteString, MonadIO m, MonadLogger m, Show r) =>
+  (HttpResponse a ByteString, MonadIO m, MonadLogger m, LambdaEncode r) =>
   Endpoints -> HttpClient a -> EventID -> r -> m ()
 postResponse' Endpoints{..} HttpClient{..} (EventID eventID) response =
-  void . liftIO $ post responseURL (B.pack . show $ response)
+  void . liftIO $ post responseURL (encodeOutput response)
   where responseURL = baseURL <> "/invocation/" <> eventID <> "/response"
 
 postError' ::

@@ -1,21 +1,23 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 
-module AWS.Lambda.JsonHandler where
+module AWS.Lambda.Handler where
 
+import AWS.Lambda.Encoding
 import           AWS.Lambda.RuntimeClient
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Logger
-import qualified Data.Aeson as A
 import           Data.Text
+import qualified Data.ByteString.Lazy as LBS
+import qualified Data.ByteString as BS
 
-jsonHandler :: (MonadIO m, MonadLogger m, A.FromJSON e, Show e, Show r) => (e -> r) -> m ()
-jsonHandler f = forever $ do
-  client <- runtimeClient (pure . A.eitherDecode)
+handler :: (MonadIO m, MonadLogger m, Decode e, Encode r) => (e -> r) -> m ()
+handler f = forever $ do
+  client <- runtimeClient
   forever $ handle client f
 
-handle :: (MonadIO m, MonadLogger m, A.FromJSON e, Show e, Show r) => RuntimeClient e r m -> (e -> r) -> m ()
+handle :: (MonadIO m, MonadLogger m) => RuntimeClient e r m -> m ()
 handle RuntimeClient{..} f = do
   event@Event{..} <- getNextEvent
   case eventBody of

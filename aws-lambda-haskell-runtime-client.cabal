@@ -31,8 +31,7 @@ library
       AWS.Lambda.APIGatewayInputEvent
       AWS.Lambda.APIGatewayOutputEvent
       AWS.Lambda.HttpClient
-      AWS.Lambda.JsonHandler
-      AWS.Lambda.DhallHandler
+      AWS.Lambda.Handler
       AWS.Lambda.KinesisDataStreamsEvent
       AWS.Lambda.RuntimeClient
       AWS.Lambda.S3Event
