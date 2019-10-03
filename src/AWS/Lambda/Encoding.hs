@@ -24,8 +24,8 @@ class LambdaEncode r where
 
 newtype LambdaFromJSON a = LambdaFromJSON a deriving A.FromJSON
 newtype LambdaToJSON a = LambdaToJSON a deriving A.ToJSON
-newtype LambdaFromDhall a = LambdaFromDhall a deriving Generic
-newtype LambdaToDhall a = LambdaToDhall a deriving Generic
+newtype LambdaFromDhall a = LambdaFromDhall a deriving D.Interpret
+newtype LambdaToDhall a = LambdaToDhall a deriving D.Inject
 
 instance A.FromJSON a => LambdaDecode (LambdaFromJSON a) where
     decodeInput = pure . A.eitherDecode
@@ -34,13 +34,13 @@ instance A.ToJSON a => LambdaEncode (LambdaToJSON a) where
     encodeOutput = LB.toStrict . A.encode
 
 instance D.Interpret a => LambdaDecode (LambdaFromDhall a) where
-    decodeInput = fmap showLeft . try . D.input D.genericAuto . LT.toStrict . LTE.decodeUtf8
+    decodeInput = fmap showLeft . try . D.input D.auto . LT.toStrict . LTE.decodeUtf8
         where
             showLeft :: Either IOException b -> Either String b
             showLeft = bimap show id  
 
 instance D.Inject a => LambdaEncode (LambdaToDhall a) where
-    encodeOutput = TE.encodeUtf8 . DC.pretty . D.embed D.genericInject
+    encodeOutput = TE.encodeUtf8 . DC.pretty . D.embed D.inject
 
 instance LambdaDecode T.Text where
     decodeInput = pure . Right . LT.toStrict . LTE.decodeUtf8
