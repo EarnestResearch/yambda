@@ -3,6 +3,7 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module AWS.Lambda.SNSEvent where
 
@@ -12,11 +13,13 @@ import qualified Data.Char as C
 import           Data.HashMap.Strict
 import           Data.Text hiding (drop)
 import           GHC.Generics
+import AWS.Lambda.Encoding
 
 newtype SNSEvent = SNSEvent { _records :: [Record] }
   deriving (Eq, Generic, Show)
-  deriving LambdaEncode via (LambdaFromJSON SNSEvent)
-  deriving LambdaDecode via (LambdaToJSON SNSEvent)
+
+deriving via (LambdaFromJSON SNSEvent) instance (LambdaDecode SNSEvent)
+deriving via (LambdaToJSON SNSEvent) instance (LambdaEncode SNSEvent)  
 
 instance ToJSON SNSEvent where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify }

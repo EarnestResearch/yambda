@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module AWS.Lambda.S3Event where
 
@@ -10,13 +11,14 @@ import Data.Aeson
 import Data.HashMap.Strict
 import Data.Text hiding (drop)
 import GHC.Generics
-
+import AWS.Lambda.Encoding
 
 newtype S3Event = S3Event { _records :: [Record] }
   deriving (Eq, Generic, Show)
-  deriving LambdaEncode via (LambdaFromJSON S3Event)
-  deriving LambdaDecode via (LambdaToJSON S3Event)
 
+deriving via (LambdaFromJSON S3Event) instance (LambdaDecode S3Event)
+deriving via (LambdaToJSON S3Event) instance (LambdaEncode S3Event)  
+  
 instance ToJSON S3Event where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify }
 

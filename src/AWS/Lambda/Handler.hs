@@ -12,12 +12,12 @@ import           Data.Text
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString as BS
 
-handler :: (MonadIO m, MonadLogger m, Decode e, Encode r) => (e -> r) -> m ()
+handler :: (MonadIO m, MonadLogger m, LambdaDecode e, LambdaEncode r) => (e -> r) -> m ()
 handler f = forever $ do
   client <- runtimeClient
   forever $ handle client f
 
-handle :: (MonadIO m, MonadLogger m) => RuntimeClient e r m -> m ()
+handle :: (MonadIO m, MonadLogger m, LambdaDecode e, LambdaEncode r) => RuntimeClient e r m -> (e -> r) -> m ()
 handle RuntimeClient{..} f = do
   event@Event{..} <- getNextEvent
   case eventBody of

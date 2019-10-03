@@ -5,6 +5,9 @@
 {-# LANGUAGE RankNTypes                 #-}
 {-# LANGUAGE RecordWildCards            #-}
 {-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE DerivingVia            #-}
+{-# LANGUAGE StandaloneDeriving            #-}
+{-# LANGUAGE DeriveAnyClass            #-}
 
 module AWS.Lambda.RuntimeClient
   ( runtimeClient
@@ -20,12 +23,14 @@ import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Logger
+import           Data.Aeson (ToJSON)
 import qualified Data.ByteString.Char8 as B
 import           Data.ByteString.Lazy as LB
 import           Data.Maybe
 import           Data.Text (Text)
 import           GHC.Generics
 import           System.Environment
+import AWS.Lambda.Encoding
 
 newtype EventID = EventID String deriving (Show)
 type ErrorMessage = String
@@ -43,8 +48,12 @@ data Error =
     errorType    :: Text
   , errorMessage :: Text
   } deriving (
-    Show
+    Show,
+    Generic,
+    ToJSON
   )
+
+deriving via (LambdaToJSON Error) instance (LambdaEncode Error)  
 
 data RuntimeClient e r m =
   RuntimeClient {
@@ -55,7 +64,7 @@ data RuntimeClient e r m =
   }
 
 runtimeClient ::
-  (MonadLogger m, MonadIO m, Decode e, Encode r) => m (RuntimeClient e r m)
+  (MonadLogger m, MonadIO m, LambdaDecode e, LambdaEncode r) => m (RuntimeClient e r m)
 runtimeClient = runtimeClientWith =<< liftIO defaultHttpClient
 
 runtimeClientWith ::
@@ -96,7 +105,7 @@ forceMaybe errorMsg = fromMaybe (error errorMsg)
 getNextEvent' ::
   (HttpResponse a ByteString, MonadIO m, MonadLogger m, LambdaDecode e) =>
   Endpoints -> HttpClient a-> m (Event e)
-getNextEvent' Endpoints{..} HttpClient{..} decode = do
+getNextEvent' Endpoints{..} HttpClient{..} = do
   response <- liftIO $ get nextURL
   setTraceID response
   eventID  <- parseEventID response 
@@ -129,7 +138,7 @@ parseEventID response = do
 parseEvent ::
   (MonadIO m, MonadLogger m, HttpResponse a ByteString, LambdaDecode e) =>
   a -> m (Either String e)
-parseEvent response = decodeInput (response ^. responseBody)
+parseEvent response = liftIO $ decodeInput (response ^. responseBody)
 
 postResponse' ::
   (HttpResponse a ByteString, MonadIO m, MonadLogger m, LambdaEncode r) =>
@@ -142,13 +151,13 @@ postError' ::
   (HttpResponse a ByteString, MonadIO m, MonadLogger m) =>
   Endpoints -> HttpClient a -> EventID -> Error -> m ()
 postError' Endpoints{..} HttpClient{..} (EventID eventID) error' =
-  void . liftIO $ post errorURL (B.pack . show $ error')
+  void . liftIO $ post errorURL (encodeOutput error')
   where errorURL = baseURL <> "/invocation/" <> eventID <> "/error"
 
 postInitError' ::
   (HttpResponse a ByteString, MonadIO m, MonadLogger m) =>
   Endpoints -> HttpClient a -> Error -> m ()
 postInitError' Endpoints{..} HttpClient{..} error' =
-  void . liftIO $ post errorURL (B.pack . show $ error')
+  void . liftIO $ post errorURL (encodeOutput error')
   where errorURL = baseURL <> "/init/error"
 

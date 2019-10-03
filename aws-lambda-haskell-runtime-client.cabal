@@ -30,6 +30,7 @@ library
   exposed-modules:
       AWS.Lambda.APIGatewayInputEvent
       AWS.Lambda.APIGatewayOutputEvent
+      AWS.Lambda.Encoding
       AWS.Lambda.HttpClient
       AWS.Lambda.Handler
       AWS.Lambda.KinesisDataStreamsEvent
@@ -52,10 +53,10 @@ library
     , mtl >=2.2.2 && <2.3
     , text >=1.2.3 && <1.3
     , transformers >=0.5.6 && <0.6
+    , prettyprinter >= 1.2 && < 1.4
     , unordered-containers >=0.2.10 && <0.3
     , wreq >=0.5.3 && <0.6
   default-language: Haskell2010
-  ghc-options: -ddump-deriv
 
 executable api-gateway-exe
   main-is: Main.hs
@@ -63,7 +64,7 @@ executable api-gateway-exe
       Paths_aws_lambda_haskell_runtime_client
   hs-source-dirs:
       examples/api-gateway
-  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
   build-depends:
       aeson >=1.4.2 && <1.5
     , aws-lambda-haskell-runtime-client
@@ -89,7 +90,7 @@ executable dhall-exe
       Paths_aws_lambda_haskell_runtime_client
   hs-source-dirs:
       examples/dhall
-  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
   build-depends:
       aeson >=1.4.2 && <1.5
     , aws-lambda-haskell-runtime-client
@@ -116,7 +117,7 @@ executable kinesis-exe
       Paths_aws_lambda_haskell_runtime_client
   hs-source-dirs:
       examples/kinesis
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -O2 -with-rtsopts=-N
   build-depends:
       aeson >=1.4.2 && <1.5
     , aws-lambda-haskell-runtime-client
@@ -142,7 +143,7 @@ executable s3-exe
       Paths_aws_lambda_haskell_runtime_client
   hs-source-dirs:
       examples/s3
-  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
   build-depends:
       aeson >=1.4.2 && <1.5
     , aws-lambda-haskell-runtime-client
@@ -168,7 +169,7 @@ executable sns-exe
       Paths_aws_lambda_haskell_runtime_client
   hs-source-dirs:
       examples/sns
-  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
   build-depends:
       aeson >=1.4.2 && <1.5
     , aws-lambda-haskell-runtime-client
@@ -200,7 +201,7 @@ test-suite aws-lambda-haskell-runtime-client-test
       Paths_aws_lambda_haskell_runtime_client
   hs-source-dirs:
       test
-  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
   build-depends:
       HUnit >=1.6.0.0 && <1.7
     , aeson >=1.4.2 && <1.5
