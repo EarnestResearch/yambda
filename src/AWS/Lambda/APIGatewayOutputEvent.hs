@@ -2,6 +2,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module AWS.Lambda.APIGatewayOutputEvent where
 
@@ -22,8 +24,9 @@ data APIGatewayOutputEvent = APIGatewayOutputEvent
   , _multiValueHeaders :: Maybe (HashMap Text [Text])
   , _body              :: Text
   } deriving (Eq, Generic, Show)
-  deriving LambdaEncode via (LambdaFromJSON APIGatewayOutputEvent)
-  deriving LambdaDecode via (LambdaToJSON APIGatewayOutputEvent) 
+
+deriving via (LambdaFromJSON APIGatewayOutputEvent) instance (LambdaDecode APIGatewayOutputEvent)
+deriving via (LambdaToJSON APIGatewayOutputEvent) instance (LambdaEncode APIGatewayOutputEvent)
 
 instance ToJSON APIGatewayOutputEvent where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 1 }

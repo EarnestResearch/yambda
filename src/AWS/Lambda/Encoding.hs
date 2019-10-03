@@ -10,6 +10,7 @@ import qualified Data.ByteString as BS
 import           Control.Monad.IO.Class
 import Control.Exception
 import Data.Bifunctor
+import Data.Coerce
 
 class LambdaDecode e where
     decodeInput :: (MonadIO m) => LB.ByteString -> m (Either String e)
