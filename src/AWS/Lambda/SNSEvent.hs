@@ -17,9 +17,8 @@ import AWS.Lambda.Encoding
 
 newtype SNSEvent = SNSEvent { _records :: [Record] }
   deriving (Eq, Generic, Show)
-
-deriving via (LambdaFromJSON SNSEvent) instance (LambdaDecode SNSEvent)
-deriving via (LambdaToJSON SNSEvent) instance (LambdaEncode SNSEvent)  
+  deriving LambdaDecode via (LambdaFromJSON SNSEvent)
+  deriving LambdaEncode via (LambdaToJSON SNSEvent)
 
 instance ToJSON SNSEvent where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify }

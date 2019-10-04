@@ -1,5 +1,4 @@
 {-#LANGUAGE DeriveGeneric #-}
-{-#LANGUAGE StandaloneDeriving #-}
 {-#LANGUAGE DerivingVia #-}
 {-#LANGUAGE DeriveAnyClass #-}
 
@@ -14,9 +13,8 @@ data User = User {
   name :: Text, 
   accountId :: Natural
 } deriving (Generic, Show, Interpret, Inject)
-
-deriving via (LambdaFromDhall User) instance (LambdaDecode User)
-deriving via (LambdaToDhall User) instance (LambdaEncode User)
+  deriving LambdaDecode via (LambdaFromDhall User)
+  deriving LambdaEncode via (LambdaToDhall User)
 
 main :: IO ()
 main = runStderrLoggingT $ handler echo

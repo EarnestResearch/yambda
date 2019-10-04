@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE DerivingVia #-}
-{-# LANGUAGE StandaloneDeriving #-}
 
 module AWS.Lambda.APIGatewayInputEvent where
 
@@ -28,9 +27,8 @@ data APIGatewayInputEvent = APIGatewayInputEvent
   , _isBase64Encoded                 :: Bool
   } 
   deriving (Eq, Generic, Show)
-
-deriving via (LambdaFromJSON APIGatewayInputEvent) instance (LambdaDecode APIGatewayInputEvent)
-deriving via (LambdaToJSON APIGatewayInputEvent) instance (LambdaEncode APIGatewayInputEvent)
+  deriving LambdaDecode via (LambdaFromJSON APIGatewayInputEvent)
+  deriving LambdaEncode via (LambdaToJSON APIGatewayInputEvent)
 
 instance ToJSON APIGatewayInputEvent where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 1 }

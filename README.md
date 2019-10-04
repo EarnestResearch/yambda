@@ -41,7 +41,6 @@ derive our encoders and decoders.
 Example
 ```haskell
 {-#LANGUAGE DeriveGeneric #-}
-{-#LANGUAGE StandaloneDeriving #-}
 {-#LANGUAGE DerivingVia #-}
 {-#LANGUAGE GeneralizedNewtypeDeriving #-}
 {-#LANGUAGE DeriveAnyClass #-}
@@ -55,9 +54,9 @@ data User = User {
   name :: Text, 
   accountId :: Natural
 } deriving (Generic, Show, FromJSON, ToJSON)
+  deriving LambdaDecode via (LambdaFromJSON User)
+  deriving LambdaEncode via (LambdaToJSON User)
 
-deriving via (LambdaFromJSON User) instance (LambdaDecode User)
-deriving via (LambdaToJSON User) instance (LambdaEncode User)
 ```
 
 We support out of the box also [Dhall](https://dhall-lang.org) encoding and decoding

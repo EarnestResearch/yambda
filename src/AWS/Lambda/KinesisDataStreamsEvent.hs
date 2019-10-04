@@ -49,9 +49,8 @@ instance FromJSON Record where
 
 newtype KinesisDataStreamsEvent = KinesisDataStreamsEvent { _records :: [Record] }
   deriving (Eq, Generic, Show)
-
-deriving via (LambdaFromJSON KinesisDataStreamsEvent) instance (LambdaDecode KinesisDataStreamsEvent)
-deriving via (LambdaToJSON KinesisDataStreamsEvent) instance (LambdaEncode KinesisDataStreamsEvent)  
+  deriving LambdaDecode via (LambdaFromJSON KinesisDataStreamsEvent)
+  deriving LambdaEncode via (LambdaToJSON KinesisDataStreamsEvent)
 
 instance ToJSON KinesisDataStreamsEvent where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify' }
