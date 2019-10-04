@@ -10,6 +10,7 @@ import qualified Data.Text.Encoding as TE
 import qualified Data.Text.Lazy as LT
 import qualified Data.Text.Lazy.Encoding as LTE
 import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as BS8
 import Control.Exception
 import Data.Bifunctor
 import Data.Coerce
@@ -53,3 +54,6 @@ instance LambdaDecode LB.ByteString where
 
 instance LambdaEncode LB.ByteString where
     encodeOutput = LB.toStrict
+
+instance LambdaEncode IOException where
+    encodeOutput = BS8.pack . show

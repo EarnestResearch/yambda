@@ -6,7 +6,6 @@
 {-# LANGUAGE RecordWildCards            #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE DerivingVia            #-}
-{-# LANGUAGE StandaloneDeriving            #-}
 {-# LANGUAGE DeriveAnyClass            #-}
 
 module AWS.Lambda.RuntimeClient
@@ -31,29 +30,7 @@ import           Data.Text (Text)
 import           GHC.Generics
 import           System.Environment
 import AWS.Lambda.Encoding
-
-newtype EventID = EventID String deriving (Show)
-type ErrorMessage = String
-
-data Event a =
-  Event {
-    eventID   :: EventID
-  , eventBody :: Either String a
-  } deriving (
-    Show
-  )
-
-data Error =
-  Error {
-    errorType    :: Text
-  , errorMessage :: Text
-  } deriving (
-    Show,
-    Generic,
-    ToJSON
-  )
-
-deriving via (LambdaToJSON Error) instance (LambdaEncode Error)  
+import AWS.Lambda.Types
 
 data RuntimeClient e r m =
   RuntimeClient {

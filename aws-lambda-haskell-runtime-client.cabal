@@ -37,6 +37,7 @@ library
       AWS.Lambda.RuntimeClient
       AWS.Lambda.S3Event
       AWS.Lambda.SNSEvent
+      AWS.Lambda.Types
   other-modules:
       Paths_aws_lambda_haskell_runtime_client
   hs-source-dirs:
