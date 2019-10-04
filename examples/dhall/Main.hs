@@ -5,9 +5,10 @@
 module Main where
 
 import AWS.Lambda.Handler
-import Control.Monad.Logger
 import Dhall
 import AWS.Lambda.Encoding
+import Control.Monad.Logger
+import Control.Monad.IO.Class
 
 data User = User {
   name :: Text, 
@@ -19,5 +20,5 @@ data User = User {
 main :: IO ()
 main = runStderrLoggingT $ handler echo
 
-echo :: User -> User
-echo = id
+echo :: (MonadIO m, MonadLogger m) => User -> m User
+echo = pure

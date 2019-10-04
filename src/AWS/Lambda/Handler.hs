@@ -12,14 +12,14 @@ import           Data.Text
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString as BS
 
-handler :: (MonadIO m, MonadLogger m, LambdaDecode e, LambdaEncode r) => (e -> r) -> m ()
+handler :: (MonadIO m, MonadLogger m, LambdaDecode e, LambdaEncode r) => (e -> m r) -> m ()
 handler f = forever $ do
   client <- runtimeClient
   forever $ handle client f
 
-handle :: (MonadIO m, MonadLogger m, LambdaDecode e, LambdaEncode r) => RuntimeClient e r m -> (e -> r) -> m ()
+handle :: (MonadIO m, MonadLogger m, LambdaDecode e, LambdaEncode r) => RuntimeClient e r m -> (e -> m r) -> m ()
 handle RuntimeClient{..} f = do
   event@Event{..} <- getNextEvent
   case eventBody of
-    Right val -> postResponse eventID (f val)
+    Right val -> f val >>= postResponse eventID
     Left e    -> postError eventID (Error "Parse failure" $ pack e)
