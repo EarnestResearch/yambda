@@ -1,5 +1,4 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 module AWS.Lambda.Encoding where
 import qualified Data.Aeson as A
@@ -14,7 +13,6 @@ import qualified Data.ByteString as BS
 import Control.Exception
 import Data.Bifunctor
 import Data.Coerce
-import GHC.Generics
 
 class LambdaDecode e where
     decodeInput :: LB.ByteString -> IO (Either String e)
@@ -37,7 +35,7 @@ instance D.Interpret a => LambdaDecode (LambdaFromDhall a) where
     decodeInput = fmap showLeft . try . D.input D.auto . LT.toStrict . LTE.decodeUtf8 . decodeText
         where
             showLeft :: Either IOException b -> Either String b
-            showLeft = bimap show id  
+            showLeft = first show  
             decodeText :: LB.ByteString -> LB.ByteString
             decodeText = either (LTE.encodeUtf8 . LT.pack) LTE.encodeUtf8 . A.eitherDecode
 

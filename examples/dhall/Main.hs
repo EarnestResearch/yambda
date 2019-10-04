@@ -1,7 +1,6 @@
 {-#LANGUAGE DeriveGeneric #-}
 {-#LANGUAGE StandaloneDeriving #-}
 {-#LANGUAGE DerivingVia #-}
-{-#LANGUAGE GeneralizedNewtypeDeriving #-}
 {-#LANGUAGE DeriveAnyClass #-}
 
 module Main where
