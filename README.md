@@ -32,6 +32,43 @@ ld-options: -static -pthread
 stack build --docker --flag your-executable:static
 ```
 
+## Deriving encoders and decoders
+This lambda runtime supports other encoding/decoding formats besides JSON, for example `Dhall`.
+For this reason, we use our own `LambdaEncode` and `LambdaDecode` classes.
+If you just need to encode and decode values from JSON, you can use `DerivingVia` to automatically
+derive our encoders and decoders.
+
+Example
+```haskell
+{-#LANGUAGE DeriveGeneric #-}
+{-#LANGUAGE StandaloneDeriving #-}
+{-#LANGUAGE DerivingVia #-}
+{-#LANGUAGE GeneralizedNewtypeDeriving #-}
+{-#LANGUAGE DeriveAnyClass #-}
+
+import AWS.Lambda.Encoding
+import Data.Aeson
+import Data.Text
+import GHC.Generics
+
+data User = User {
+  name :: Text, 
+  accountId :: Natural
+} deriving (Generic, Show, FromJSON, ToJSON)
+
+deriving via (LambdaFromJSON User) instance (LambdaDecode User)
+deriving via (LambdaToJSON User) instance (LambdaEncode User)
+```
+
+We support out of the box also [Dhall](https://dhall-lang.org) encoding and decoding
+using the `LambdaFromDhall` and `LambdaToDhall` classes.
+
+You can create your custom encoders and decoders too! The important thing 
+is that since AWS Lambda only supports JSON inputs, you pass your values
+as escaped strings and unescape them in your decoder. 
+
+See [Encoding.hs](src/AWS/Lambda/Encoding.hs) for some examples of encoders and decoders. 
+
 ## Contributing
 
 ### Prerequisites
