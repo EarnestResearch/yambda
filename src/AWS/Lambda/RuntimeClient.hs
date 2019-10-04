@@ -34,10 +34,10 @@ import AWS.Lambda.Types
 
 data RuntimeClient e r m =
   RuntimeClient {
-    getNextEvent  :: (MonadIO m, MonadLogger m) => m (Event e)
-  , postResponse  :: (MonadIO m, MonadLogger m) => EventID -> r -> m ()
-  , postError     :: (MonadIO m, MonadLogger m) => EventID -> Error -> m ()
-  , postInitError :: (MonadIO m, MonadLogger m) => Error -> m ()
+    getNextEvent  :: m (Event e)
+  , postResponse  :: EventID -> r -> m ()
+  , postError     :: EventID -> Error -> m ()
+  , postInitError :: Error -> m ()
   }
 
 runtimeClient ::
