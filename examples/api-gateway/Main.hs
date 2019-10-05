@@ -12,5 +12,5 @@ import Control.Monad.Except
 main :: IO ()
 main = runStderrLoggingT $ handler echo
 
-echo :: (LambdaEncode e, MonadIO m, MonadLogger m, MonadError e m) => APIGatewayInputEvent -> m APIGatewayOutputEvent
+echo :: Applicative m => APIGatewayInputEvent -> m APIGatewayOutputEvent
 echo ie = pure $ apiGatewayOutputEvent $ ie ^. body
