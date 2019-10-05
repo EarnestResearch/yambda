@@ -20,7 +20,7 @@ handler f = forever $ do
   client <- runtimeClient
   forever $ handle client f
 
-handle :: (LambdaEncode err, MonadError err m, MonadIO m, MonadLogger m, LambdaDecode e, LambdaEncode r) => RuntimeClient e r m -> (e -> m r) -> m ()
+handle :: (LambdaEncode err, MonadError err m, MonadIO m) => RuntimeClient e r m -> (e -> m r) -> m ()
 handle c@RuntimeClient{..} f = do
   event@Event{..} <- getNextEvent
   let 
