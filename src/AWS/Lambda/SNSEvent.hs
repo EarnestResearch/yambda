@@ -2,6 +2,8 @@
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module AWS.Lambda.SNSEvent where
 
@@ -11,9 +13,12 @@ import qualified Data.Char as C
 import           Data.HashMap.Strict
 import           Data.Text hiding (drop)
 import           GHC.Generics
+import AWS.Lambda.Encoding
 
 newtype SNSEvent = SNSEvent { _records :: [Record] }
   deriving (Eq, Generic, Show)
+  deriving LambdaDecode via (LambdaFromJSON SNSEvent)
+  deriving LambdaEncode via (LambdaToJSON SNSEvent)
 
 instance ToJSON SNSEvent where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify }

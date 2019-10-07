@@ -1,22 +1,12 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
 module Main where
 
-import AWS.Lambda.RuntimeClient
+import AWS.Lambda.Handler
 import AWS.Lambda.S3Event
-import Control.Monad
-import Control.Monad.IO.Class
 import Control.Monad.Logger
-import Data.Text (pack)
 
 main :: IO ()
-main = runStderrLoggingT $ do
-  client <- runtimeClient
-  forever $ echo client
+main = runStderrLoggingT $ handler echo
 
-echo :: (MonadLogger m, MonadIO m) => RuntimeClient S3Event S3Event m -> m ()
-echo RuntimeClient{..} = do
-  Event{..} <- getNextEvent
-  case eventBody of
-    Right e -> postResponse eventID e
-    Left e  -> postError eventID $ Error "Unexpected Error" $ pack e
+echo :: Applicative m => S3Event -> m S3Event
+echo = pure
+

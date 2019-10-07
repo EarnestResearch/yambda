@@ -1,23 +1,14 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
-
 module Main where
 
+import AWS.Lambda.Handler
 import AWS.Lambda.KinesisDataStreamsEvent
-import AWS.Lambda.RuntimeClient
-import Control.Monad
-import Control.Monad.IO.Class
+import AWS.Lambda.Encoding
 import Control.Monad.Logger
-import Data.Text
+import Control.Monad.IO.Class
+import Control.Monad.Except
 
 main :: IO ()
-main = runStderrLoggingT $ do
-  client <- runtimeClient
-  forever $ echo client
+main = runStderrLoggingT $ handler echo
 
-echo :: (MonadLogger m, MonadIO m) => RuntimeClient KinesisDataStreamsEvent KinesisDataStreamsEvent m -> m ()
-echo RuntimeClient{..} = do
-  Event{..} <- getNextEvent
-  case eventBody of
-    Right e -> postResponse eventID e
-    Left e  -> postError eventID $ Error "Unexpected Error" $ pack e
+echo :: Applicative m => KinesisDataStreamsEvent -> m KinesisDataStreamsEvent
+echo = pure

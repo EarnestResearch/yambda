@@ -5,6 +5,7 @@
 
 module AWS.Lambda.RuntimeClientSpec where
 
+import AWS.Lambda.Encoding
 import AWS.Lambda.HttpClient
 import AWS.Lambda.RuntimeClient
 import AWS.Lambda.TestHttpClient
@@ -54,8 +55,8 @@ testSetsTraceId = runNoLoggingT $ do
   traceId <- liftIO $ lookupEnv "_X_AMZN_TRACE_ID"
   liftIO $ traceId `shouldBe` Just "67890"
   where
-    runtimeClientWith' = runtimeClientWith @_ @Text @Text
-    httpClient = defaultTestHttpClient @Text "Hello, world"
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
+    httpClient = defaultTestHttpClient ("Hello, world" :: Text)
 
 testReturnsEventId :: Expectation
 testReturnsEventId = runNoLoggingT $ do
@@ -63,17 +64,17 @@ testReturnsEventId = runNoLoggingT $ do
   Event{..} <- getNextEvent
   liftIO $ show eventID `shouldBe` "EventID \"12345\""
   where
-    runtimeClientWith' = runtimeClientWith @_ @Text @Text
-    httpClient = defaultTestHttpClient @Text "Hello, world"
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
+    httpClient = defaultTestHttpClient ("Hello, world" :: Text)
 
 testReturnsEvent :: Expectation
 testReturnsEvent = runNoLoggingT $ do
   RuntimeClient{..} <- runtimeClientWith' httpClient
   Event{..} <- getNextEvent
-  liftIO $ eventBody `shouldBe` Right "Hello, world"
+  liftIO $ eventBody `shouldBe` Right "\"Hello, world\""
   where
-    runtimeClientWith' = runtimeClientWith @_ @Text @Text
-    httpClient = defaultTestHttpClient @Text "Hello, world"
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
+    httpClient = defaultTestHttpClient ("Hello, world" :: Text)
 
 withGetUrl :: HttpClient a -> String -> HttpClient a
 withGetUrl (HttpClient get' post') url =
@@ -84,7 +85,7 @@ testGetUrl = runNoLoggingT $ do
   RuntimeClient{..} <- runtimeClientWith' httpClient
   void getNextEvent
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient =
       defaultTestHttpClient Null
         `withGetUrl` "http://example.com/2018-06-01/runtime/invocation/next"
@@ -96,9 +97,9 @@ testPostResponseUrl :: Expectation
 testPostResponseUrl = runNoLoggingT $ do
   RuntimeClient{..} <- runtimeClientWith' httpClient
   Event{..} <- getNextEvent
-  void $ postResponse eventID Null
+  void $ postResponse eventID ""
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient =
       defaultTestHttpClient Null
         `withPostUrl` "http://example.com/2018-06-01/runtime/invocation/12345/response"
@@ -109,7 +110,7 @@ testPostErrorUrl = runNoLoggingT $ do
   Event{..} <- getNextEvent
   void $ postError eventID $ Error "Test" "Test"
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient =
       defaultTestHttpClient Null
         `withPostUrl` "http://example.com/2018-06-01/runtime/invocation/12345/error"
@@ -120,14 +121,14 @@ testPostInitErrorUrl = runNoLoggingT $ do
   Event{..} <- getNextEvent
   void . postInitError $ Error "Test" "Test"
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient =
       defaultTestHttpClient Null
         `withPostUrl` "http://example.com/2018-06-01/runtime/init/error"
 
-withPostBody :: (ToJSON b) => HttpClient a -> b -> HttpClient a
-withPostBody (HttpClient get' post') b = HttpClient get' (\x y -> shouldBe y body' >> post' x y)
-  where body' = toEncoding b
+withPostBody :: (LambdaEncode b) => HttpClient a -> b -> HttpClient a
+withPostBody (HttpClient get' post') b = HttpClient get' (\x y -> shouldBe body' y >> post' x y)
+  where body' = encodeOutput b
 
 testPostResponseBody :: Expectation
 testPostResponseBody = runNoLoggingT $ do
@@ -135,7 +136,7 @@ testPostResponseBody = runNoLoggingT $ do
   Event{..} <- getNextEvent
   void $ postResponse eventID body'
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Text
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient = defaultTestHttpClient Null `withPostBody` body'
     body' :: Text
     body' = "Hello, World"
@@ -146,7 +147,7 @@ testPostErrorBody = runNoLoggingT $ do
   Event{..} <- getNextEvent
   void $ postError eventID error'
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient = defaultTestHttpClient Null `withPostBody` error'
     error' = Error "Test" "Hello, World"
 
@@ -156,7 +157,7 @@ testPostInitErrorBody = runNoLoggingT $ do
   Event{..} <- getNextEvent
   void $ postInitError error'
   where
-    runtimeClientWith' = runtimeClientWith @_ @Value @Value
+    runtimeClientWith' = runtimeClientWith @_ @_ @Text @Text
     httpClient = defaultTestHttpClient Null `withPostBody` error'
     error' = Error "Test" "Hello, World"
 

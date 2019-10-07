@@ -1,12 +1,16 @@
 {-# LANGUAGE DeriveGeneric   #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE StandaloneDeriving #-}
+
 module AWS.Lambda.KinesisDataStreamsEvent where
 
 import Control.Lens
 import Data.Aeson
 import Data.Text (Text)
 import GHC.Generics
+import AWS.Lambda.Encoding
 
 data Kinesis = Kinesis
   { _partitionKey         :: Text
@@ -43,9 +47,10 @@ instance ToJSON Record where
 instance FromJSON Record where
   parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
 
-
 newtype KinesisDataStreamsEvent = KinesisDataStreamsEvent { _records :: [Record] }
   deriving (Eq, Generic, Show)
+  deriving LambdaDecode via (LambdaFromJSON KinesisDataStreamsEvent)
+  deriving LambdaEncode via (LambdaToJSON KinesisDataStreamsEvent)
 
 instance ToJSON KinesisDataStreamsEvent where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify' }
