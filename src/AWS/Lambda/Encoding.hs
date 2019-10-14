@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module AWS.Lambda.Encoding where
 import qualified Data.Aeson as A
@@ -57,3 +58,9 @@ instance LambdaEncode LB.ByteString where
 
 instance LambdaEncode IOException where
     encodeOutput = BS8.pack . show
+
+instance LambdaDecode () where
+    decodeInput _ = pure $ Right ()
+
+instance LambdaEncode () where
+    encodeOutput _ = ""
