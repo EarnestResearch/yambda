@@ -1,19 +1,19 @@
 {-# LANGUAGE DeriveAnyClass        #-}
 {-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE DerivingVia           #-}
 {-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE StandaloneDeriving    #-}
 {-# LANGUAGE TemplateHaskell       #-}
-{-# LANGUAGE DerivingVia #-}
-{-# LANGUAGE StandaloneDeriving #-}
 
 module AWS.Lambda.SNSEvent where
 
+import           AWS.Lambda.Encoding
 import           Control.Lens
 import           Data.Aeson
 import qualified Data.Char as C
 import           Data.HashMap.Strict
 import           Data.Text hiding (drop)
 import           GHC.Generics
-import AWS.Lambda.Encoding
 
 newtype SNSEvent = SNSEvent { _records :: [Record] }
   deriving (Eq, Generic, Show)

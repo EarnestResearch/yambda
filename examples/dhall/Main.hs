@@ -1,16 +1,16 @@
-{-#LANGUAGE DeriveGeneric #-}
-{-#LANGUAGE DerivingVia #-}
-{-#LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric  #-}
+{-# LANGUAGE DerivingVia    #-}
 
 module Main where
 
-import AWS.Lambda.Handler
-import Dhall
 import AWS.Lambda.Encoding
+import AWS.Lambda.Handler
 import Control.Monad.Logger
+import Dhall
 
 data User = User {
-  name :: Text, 
+  name      :: Text,
   accountId :: Natural
 } deriving (Generic, Show, Interpret, Inject)
   deriving LambdaDecode via (LambdaFromDhall User)

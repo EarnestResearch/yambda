@@ -27,7 +27,7 @@ instance HttpResponse (W.Response body) body where
 data HttpClient a =
   HttpClient {
     get  :: (HttpResponse a LB.ByteString) => String -> IO a
-  , post :: (HttpResponse a LB.ByteString) => String -> SB.ByteString -> IO a
+  , post :: (HttpResponse a LB.ByteString) => String -> Value -> IO a
   }
 
 defaultHttpClient :: IO (HttpClient (W.Response LB.ByteString))

@@ -1,22 +1,22 @@
 {-# LANGUAGE DeriveAnyClass  #-}
 {-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE DerivingVia     #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE DerivingVia #-}
 
 module AWS.Lambda.S3Event where
 
+import AWS.Lambda.Encoding
 import Control.Lens
 import Data.Aeson
 import Data.HashMap.Strict
 import Data.Text hiding (drop)
 import GHC.Generics
-import AWS.Lambda.Encoding
 
 newtype S3Event = S3Event { _records :: [Record] }
   deriving (Eq, Generic, Show)
   deriving LambdaDecode via (LambdaFromJSON S3Event)
   deriving LambdaEncode via (LambdaToJSON S3Event)
-  
+
 instance ToJSON S3Event where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify }
 

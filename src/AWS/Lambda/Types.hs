@@ -1,13 +1,13 @@
-{-# LANGUAGE DerivingVia            #-}
-{-# LANGUAGE DeriveAnyClass            #-}
-{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric  #-}
+{-# LANGUAGE DerivingVia    #-}
 
 module AWS.Lambda.Types where
 
 import AWS.Lambda.Encoding
-import GHC.Generics
 import Data.Aeson
 import Data.Text
+import GHC.Generics
 
 newtype EventID = EventID String deriving (Show)
 type ErrorMessage = String
@@ -23,7 +23,7 @@ data Event a =
 data Error =
   Error {
     errorType    :: Text
-  , errorMessage :: Text
+  , errorMessage :: Value
   } deriving (
     Show,
     Generic,
