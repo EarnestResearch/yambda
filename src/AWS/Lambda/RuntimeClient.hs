@@ -1,12 +1,12 @@
+{-# LANGUAGE DeriveAnyClass             #-}
 {-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE DerivingVia                #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE RankNTypes                 #-}
 {-# LANGUAGE RecordWildCards            #-}
 {-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE DerivingVia            #-}
-{-# LANGUAGE DeriveAnyClass            #-}
 
 module AWS.Lambda.RuntimeClient
   ( runtimeClient
@@ -17,7 +17,9 @@ module AWS.Lambda.RuntimeClient
   , EventID
   ) where
 
+import           AWS.Lambda.Encoding
 import           AWS.Lambda.HttpClient
+import           AWS.Lambda.Types
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
@@ -29,8 +31,6 @@ import           Data.Maybe
 import           Data.Text (Text)
 import           GHC.Generics
 import           System.Environment
-import AWS.Lambda.Encoding
-import AWS.Lambda.Types
 
 data RuntimeClient e r m =
   RuntimeClient {
@@ -85,7 +85,7 @@ getNextEvent' ::
 getNextEvent' Endpoints{..} HttpClient{..} = do
   response <- liftIO $ get nextURL
   setTraceID response
-  eventID  <- parseEventID response 
+  eventID  <- parseEventID response
   eventBody <- parseEvent response
   pure $ Event eventID eventBody
 

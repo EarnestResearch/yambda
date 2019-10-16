@@ -1,11 +1,11 @@
 module Main where
 
+import AWS.Lambda.Encoding
 import AWS.Lambda.Handler
 import AWS.Lambda.KinesisDataStreamsEvent
-import AWS.Lambda.Encoding
-import Control.Monad.Logger
-import Control.Monad.IO.Class
 import Control.Monad.Except
+import Control.Monad.IO.Class
+import Control.Monad.Logger
 
 main :: IO ()
 main = runStderrLoggingT $ handler echo

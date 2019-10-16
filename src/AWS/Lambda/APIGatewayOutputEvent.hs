@@ -1,16 +1,16 @@
-{-# LANGUAGE DeriveGeneric   #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE DerivingVia       #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module AWS.Lambda.APIGatewayOutputEvent where
 
+import AWS.Lambda.Encoding
 import Control.Lens
 import Data.Aeson
 import Data.HashMap.Strict
 import Data.Text (Text)
 import GHC.Generics
-import AWS.Lambda.Encoding
 
 apiGatewayOutputEvent :: Text -> APIGatewayOutputEvent
 apiGatewayOutputEvent = APIGatewayOutputEvent False 200 Nothing Nothing

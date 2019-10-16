@@ -1,20 +1,20 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings          #-}
 
 module AWS.Lambda.Encoding where
+import           Control.Exception
 import qualified Data.Aeson as A
-import qualified Dhall as D
-import qualified Dhall.Core as DC
+import           Data.Bifunctor
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as BS8
 import qualified Data.ByteString.Lazy as LB
+import           Data.Coerce
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import qualified Data.Text.Lazy as LT
 import qualified Data.Text.Lazy.Encoding as LTE
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Char8 as BS8
-import Control.Exception
-import Data.Bifunctor
-import Data.Coerce
+import qualified Dhall as D
+import qualified Dhall.Core as DC
 
 class LambdaDecode e where
     decodeInput :: LB.ByteString -> IO (Either String e)
@@ -37,7 +37,7 @@ instance D.Interpret a => LambdaDecode (LambdaFromDhall a) where
     decodeInput = fmap showLeft . try . D.input D.auto . LT.toStrict . LTE.decodeUtf8 . decodeText
         where
             showLeft :: Either IOException b -> Either String b
-            showLeft = first show  
+            showLeft = first show
             decodeText :: LB.ByteString -> LB.ByteString
             decodeText = either (LTE.encodeUtf8 . LT.pack) LTE.encodeUtf8 . A.eitherDecode
 

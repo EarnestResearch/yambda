@@ -11,10 +11,10 @@ import           Control.Monad.Except
 import           Control.Monad.IO.Class
 import           Control.Monad.Logger
 import qualified Data.Aeson as A
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as LBS
 import           Data.Text
 import qualified Data.Text.Encoding as TE
-import qualified Data.ByteString.Lazy as LBS
-import qualified Data.ByteString as BS
 
 handler :: (LambdaEncode err, MonadError err m, MonadIO m, MonadLogger m, LambdaDecode e, LambdaEncode r) => (e -> m r) -> m ()
 handler f = forever $ do
@@ -24,7 +24,7 @@ handler f = forever $ do
 handle :: (LambdaEncode err, MonadError err m, MonadIO m) => RuntimeClient e r m -> (e -> m r) -> m ()
 handle c@RuntimeClient{..} f = do
   event@Event{..} <- getNextEvent
-  let 
+  let
     result = case eventBody of
       Right val -> f val >>= postResponse eventID
       Left e    -> postError eventID (Error "Parse failure" $ (A.String . pack) e)

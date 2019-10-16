@@ -1,15 +1,15 @@
 {-# LANGUAGE DeriveGeneric   #-}
+{-# LANGUAGE DerivingVia     #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE DerivingVia #-}
 
 module AWS.Lambda.APIGatewayInputEvent where
 
+import AWS.Lambda.Encoding
 import Control.Lens
 import Data.Aeson
 import Data.HashMap.Strict
 import Data.Text (Text)
 import GHC.Generics
-import AWS.Lambda.Encoding
 
 
 data APIGatewayInputEvent = APIGatewayInputEvent
@@ -25,7 +25,7 @@ data APIGatewayInputEvent = APIGatewayInputEvent
   , _requestContext                  :: HashMap Text Value
   , _body                            :: Text
   , _isBase64Encoded                 :: Bool
-  } 
+  }
   deriving (Eq, Generic, Show)
   deriving LambdaDecode via (LambdaFromJSON APIGatewayInputEvent)
   deriving LambdaEncode via (LambdaToJSON APIGatewayInputEvent)

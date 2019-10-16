@@ -1,16 +1,16 @@
-{-# LANGUAGE DeriveGeneric   #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE DerivingVia        #-}
+{-# LANGUAGE RecordWildCards    #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell    #-}
 
 module AWS.Lambda.KinesisDataStreamsEvent where
 
+import AWS.Lambda.Encoding
 import Control.Lens
 import Data.Aeson
 import Data.Text (Text)
 import GHC.Generics
-import AWS.Lambda.Encoding
 
 data Kinesis = Kinesis
   { _partitionKey         :: Text
