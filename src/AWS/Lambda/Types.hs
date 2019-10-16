@@ -23,7 +23,7 @@ data Event a =
 data Error =
   Error {
     errorType    :: Text
-  , errorMessage :: Text
+  , errorMessage :: Value
   } deriving (
     Show,
     Generic,

@@ -10,6 +10,7 @@ import           Control.Monad
 import           Control.Monad.Except
 import           Control.Monad.IO.Class
 import           Control.Monad.Logger
+import qualified Data.Aeson as A
 import           Data.Text
 import qualified Data.Text.Encoding as TE
 import qualified Data.ByteString.Lazy as LBS
@@ -26,5 +27,5 @@ handle c@RuntimeClient{..} f = do
   let 
     result = case eventBody of
       Right val -> f val >>= postResponse eventID
-      Left e    -> postError eventID (Error "Parse failure" $ pack e)
-  catchError result (postError eventID . Error "Error" . TE.decodeUtf8 . encodeOutput)
+      Left e    -> postError eventID (Error "Parse failure" $ (A.String . pack) e)
+  catchError result (postError eventID . Error "Error" . encodeOutput)

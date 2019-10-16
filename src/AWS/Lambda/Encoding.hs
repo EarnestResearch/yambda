@@ -20,7 +20,7 @@ class LambdaDecode e where
     decodeInput :: LB.ByteString -> IO (Either String e)
 
 class LambdaEncode r where
-    encodeOutput :: r -> BS.ByteString
+    encodeOutput :: r -> A.Value
 
 newtype LambdaFromJSON a = LambdaFromJSON a deriving A.FromJSON
 newtype LambdaToJSON a = LambdaToJSON a deriving A.ToJSON
@@ -31,7 +31,7 @@ instance A.FromJSON a => LambdaDecode (LambdaFromJSON a) where
     decodeInput = pure . A.eitherDecode
 
 instance A.ToJSON a => LambdaEncode (LambdaToJSON a) where
-    encodeOutput = LB.toStrict . A.encode
+    encodeOutput = A.toJSON
 
 instance D.Interpret a => LambdaDecode (LambdaFromDhall a) where
     decodeInput = fmap showLeft . try . D.input D.auto . LT.toStrict . LTE.decodeUtf8 . decodeText
@@ -42,25 +42,25 @@ instance D.Interpret a => LambdaDecode (LambdaFromDhall a) where
             decodeText = either (LTE.encodeUtf8 . LT.pack) LTE.encodeUtf8 . A.eitherDecode
 
 instance D.Inject a => LambdaEncode (LambdaToDhall a) where
-    encodeOutput = TE.encodeUtf8 . DC.pretty . D.embed D.inject
+    encodeOutput = A.String . DC.pretty . D.embed D.inject
 
 instance LambdaDecode T.Text where
     decodeInput = pure . Right . LT.toStrict . LTE.decodeUtf8
 
 instance LambdaEncode T.Text where
-    encodeOutput = TE.encodeUtf8
+    encodeOutput = A.String
 
 instance LambdaDecode LB.ByteString where
     decodeInput = pure . Right
 
 instance LambdaEncode LB.ByteString where
-    encodeOutput = LB.toStrict
+    encodeOutput = A.String . LT.toStrict . LTE.decodeUtf8
 
 instance LambdaEncode IOException where
-    encodeOutput = BS8.pack . show
+    encodeOutput = A.String . T.pack . show
 
 instance LambdaDecode () where
     decodeInput _ = pure $ Right ()
 
 instance LambdaEncode () where
-    encodeOutput _ = ""
+    encodeOutput _ = A.String ""
