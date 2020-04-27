@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
-name:           aws-lambda-haskell-runtime-client
+name:           aws-lambda-haskell-runtime-client-examples
 version:        0.1.0.0
 synopsis:       AWS Lambda Haskell Runtime Client
 description:    Please see the README on GitHub at <https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme>
@@ -13,9 +13,6 @@ copyright:      Earnest Research 2019
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
-extra-source-files:
-    README.md
-    ChangeLog.md
 
 source-repository head
   type: git
@@ -26,43 +23,12 @@ flag static
   manual: True
   default: False
 
-library
-  exposed-modules:
-      AWS.Lambda.APIGatewayInputEvent
-      AWS.Lambda.APIGatewayOutputEvent
-      AWS.Lambda.Encoding
-      AWS.Lambda.HttpClient
-      AWS.Lambda.Handler
-      AWS.Lambda.KinesisDataStreamsEvent
-      AWS.Lambda.RuntimeClient
-      AWS.Lambda.S3Event
-      AWS.Lambda.SNSEvent
-      AWS.Lambda.Types
-  other-modules:
-      Paths_aws_lambda_haskell_runtime_client
-  hs-source-dirs:
-      src
-  build-depends:
-      aeson >=1.4.2 && <1.5
-    , base >=4.7 && <5
-    , bytestring >=0.10.8 && <0.11
-    , dhall >= 1.26.1 && < 1.31
-    , http-client >=0.5.14 && <0.7
-    , http-types >=0.12.3 && <0.13
-    , lens >=4.17.1 && <4.19
-    , monad-logger >=0.3.30 && <0.4
-    , mtl >=2.2.2 && <2.3
-    , text >=1.2.3 && <1.3
-    , unordered-containers >=0.2.10 && <0.3
-    , wreq >=0.5.3 && <0.6
-  default-language: Haskell2010
-
 executable api-gateway-exe
   main-is: Main.hs
   other-modules:
-      Paths_aws_lambda_haskell_runtime_client
+      Paths_aws_lambda_haskell_runtime_client_examples
   hs-source-dirs:
-      examples/api-gateway
+      api-gateway
   ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
   build-depends:
       aws-lambda-haskell-runtime-client
@@ -77,9 +43,9 @@ executable api-gateway-exe
 executable dhall-exe
   main-is: Main.hs
   other-modules:
-      Paths_aws_lambda_haskell_runtime_client
+      Paths_aws_lambda_haskell_runtime_client_examples
   hs-source-dirs:
-      examples/dhall
+      dhall
   ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
   build-depends:
       aws-lambda-haskell-runtime-client
@@ -94,9 +60,9 @@ executable dhall-exe
 executable kinesis-exe
   main-is: Main.hs
   other-modules:
-      Paths_aws_lambda_haskell_runtime_client
+      Paths_aws_lambda_haskell_runtime_client_examples
   hs-source-dirs:
-      examples/kinesis
+      kinesis
   ghc-options: -threaded -rtsopts -O2 -with-rtsopts=-N
   build-depends:
       aws-lambda-haskell-runtime-client
@@ -111,9 +77,9 @@ executable kinesis-exe
 executable s3-exe
   main-is: Main.hs
   other-modules:
-      Paths_aws_lambda_haskell_runtime_client
+      Paths_aws_lambda_haskell_runtime_client_examples
   hs-source-dirs:
-      examples/s3
+      s3
   ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
   build-depends:
       aws-lambda-haskell-runtime-client
@@ -127,9 +93,9 @@ executable s3-exe
 executable sns-exe
   main-is: Main.hs
   other-modules:
-      Paths_aws_lambda_haskell_runtime_client
+      Paths_aws_lambda_haskell_runtime_client_examples
   hs-source-dirs:
-      examples/sns
+      sns
   ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
   build-depends:
       aws-lambda-haskell-runtime-client
@@ -138,33 +104,4 @@ executable sns-exe
   if flag(static)
     cc-options: -static
     ld-options: -static -pthread
-  default-language: Haskell2010
-
-test-suite aws-lambda-haskell-runtime-client-test
-  type: exitcode-stdio-1.0
-  main-is: Spec.hs
-  other-modules:
-      AWS.Lambda.KinesisDataStreamsEventSpec
-      AWS.Lambda.KinesisSpec
-      AWS.Lambda.RuntimeClientSpec
-      AWS.Lambda.S3EventSpec
-      AWS.Lambda.TestHttpClient
-      Paths_aws_lambda_haskell_runtime_client
-  hs-source-dirs:
-      test
-  ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
-  build-depends:
-      HUnit >=1.6.0.0 && <1.7
-    , aeson >=1.4.2 && <1.5
-    , aws-lambda-haskell-runtime-client
-    , base >=4.7 && <5
-    , bytestring >=0.10.8 && <0.11
-    , hspec >=2.6.1 && <2.8
-    , http-types >=0.12.3 && <0.13
-    , keys >=3.12.2 && <3.13
-    , lens >=4.17.1 && <4.19
-    , monad-logger >=0.3.30 && <0.4
-    , mtl >=2.2.2 && <2.3
-    , text >=1.2.3 && <1.3
-    , unordered-containers >=0.2.10 && <0.3
   default-language: Haskell2010
