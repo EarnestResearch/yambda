@@ -81,7 +81,7 @@ See [Encoding.hs](src/AWS/Lambda/Encoding.hs) for some examples of encoders and 
 ### Building
 
 The default make target will compile and test the executables defined in
-`package.yaml`. You can find the produced artifacts in the `build` directory.
+`aws-lambda-haskell-runtime-client.cabal`. You can find the produced artifacts in the `build` directory.
 
 ```
 make
@@ -112,7 +112,7 @@ To add a new usage example:
 1. Add a SAM template that defines the resources needed by your lambda function
    in your new directory. It should be named `template.yaml`. Use `CodeUri:
 '{{ZIP_FILE_PATH}}'` for the code URI attribute.
-1. Define a new executable in `package.yaml`. Use the name of your directory as the executable name.
+1. Define a new executable in `aws-lambda-haskell-runtime-client.cabal`. Use the name of your directory as the executable name.
 1. Add the directory name to the `EXAMPLES` variable in the `Makefile`.
 1. Run `make` to verify there are no errors.
 

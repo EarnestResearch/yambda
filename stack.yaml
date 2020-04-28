@@ -1,10 +1,8 @@
-resolver: lts-14.7
+resolver: lts-15.3
 
 packages:
 - .
 
-extra-deps:
-- dhall-1.26.1@sha256:e291354ce0191b51b1c65c4f857f59c4bc2ed1983ea69a6e11a2f814dcd74709,30033
 docker:
   enable: true
 
