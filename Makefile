@@ -7,7 +7,7 @@ build: ## compile and test
 
 .PHONY: dev
 dev: ## automatically compile and test when a file is written
-	stack build --test --no-docker --file-watch
+	stack build --test --file-watch
 
 .PHONY: clean
 clean: ## remove all cached files
@@ -69,7 +69,7 @@ PACKAGES = stylish-haskell hlint
 .PHONY: ready
 ready: ## pull the docker image used to build, install code formatter, etc
 	stack docker pull
-	for i in $(PACKAGES); do stack install $$i --no-docker;  done
+	for i in $(PACKAGES); do stack install $$i ;  done
 
 .PHONY: help
 help: ## help
