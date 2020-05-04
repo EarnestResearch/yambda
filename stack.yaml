@@ -3,7 +3,3 @@ resolver: lts-15.3
 packages:
   - core
   - examples
-
-docker:
-  enable: true
-
