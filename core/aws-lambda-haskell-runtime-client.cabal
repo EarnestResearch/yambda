@@ -1,7 +1,13 @@
-cabal-version: 1.12
+cabal-version: 2.0
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 0c8b430d6bb13fc46f2a1bab9154f12d746b12949ae32dd3e2917cbcb4740752
 
 name:           aws-lambda-haskell-runtime-client
-version:        0.1.0.0
+version:        0.1.0.1
 synopsis:       AWS Lambda Haskell Runtime Client
 description:    Please see the README on GitHub at <https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme>
 category:       AWS
@@ -31,8 +37,8 @@ library
       AWS.Lambda.APIGatewayInputEvent
       AWS.Lambda.APIGatewayOutputEvent
       AWS.Lambda.Encoding
-      AWS.Lambda.HttpClient
       AWS.Lambda.Handler
+      AWS.Lambda.HttpClient
       AWS.Lambda.KinesisDataStreamsEvent
       AWS.Lambda.RuntimeClient
       AWS.Lambda.S3Event
@@ -40,13 +46,17 @@ library
       AWS.Lambda.Types
   other-modules:
       Paths_aws_lambda_haskell_runtime_client
+  autogen-modules:
+      Paths_aws_lambda_haskell_runtime_client
   hs-source-dirs:
       src
   build-depends:
       aeson >=1.4.2 && <1.5
     , base >=4.7 && <5
+    , base64 >0.4
     , bytestring >=0.10.8 && <0.11
-    , dhall >= 1.26.1 && < 1.31
+    , containers >0.6.2
+    , dhall >=1.26.1 && <1.31
     , http-client >=0.5.14 && <0.7
     , http-types >=0.12.3 && <0.13
     , lens >=4.17.1 && <4.19
@@ -67,6 +77,8 @@ test-suite aws-lambda-haskell-runtime-client-test
       AWS.Lambda.S3EventSpec
       AWS.Lambda.TestHttpClient
       Paths_aws_lambda_haskell_runtime_client
+  autogen-modules:
+      Paths_aws_lambda_haskell_runtime_client
   hs-source-dirs:
       test
   ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
@@ -76,6 +88,7 @@ test-suite aws-lambda-haskell-runtime-client-test
     , aws-lambda-haskell-runtime-client
     , base >=4.7 && <5
     , bytestring >=0.10.8 && <0.11
+    , containers >0.6.2
     , hspec >=2.6.1 && <2.8
     , http-types >=0.12.3 && <0.13
     , keys >=3.12.2 && <3.13
