@@ -1,0 +1,82 @@
+name: aws-lambda-haskell-runtime-client-examples
+version: '0.1.0.0'
+synopsis: AWS Lambda Haskell Runtime Client
+description: Please see the README on GitHub at <https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme>
+category: AWS
+author: Louis Vera
+maintainer: dcq-team@earnestresearch.com
+copyright: Earnest Research 2019
+license: MIT
+github: EarnestResearch/aws-lambda-haskell-runtime-client
+
+ghc-options:
+- -O2
+- -rtsopts
+- -threaded
+- -Wall
+- -with-rtsopts=-N
+
+dependencies:
+- aws-lambda-haskell-runtime-client
+- base >=4.7 && <5
+- dhall >=1.26.1 && <1.31
+- lens >=4.17.1 && <4.19
+- monad-logger >=0.3.30 && <0.4
+- mtl >=2.2.2 && <2.3
+
+executables:
+  api-gateway-exe:
+    main: Main.hs
+    source-dirs: api-gateway
+    when:
+    - condition: flag(static)
+      cc-options: -static
+      ld-options:
+      - -static
+      - -pthread
+
+  dhall-exe:
+    main: Main.hs
+    source-dirs: dhall
+    when:
+    - condition: flag(static)
+      cc-options: -static
+      ld-options:
+      - -static
+      - -pthread
+
+  s3-exe:
+    main: Main.hs
+    source-dirs: s3
+    when:
+    - condition: flag(static)
+      cc-options: -static
+      ld-options:
+      - -static
+      - -pthread
+
+  kinesis-exe:
+    main: Main.hs
+    source-dirs: kinesis
+    when:
+    - condition: flag(static)
+      cc-options: -static
+      ld-options:
+      - -static
+      - -pthread
+
+  sns-exe:
+    main: Main.hs
+    source-dirs: sns
+    when:
+    - condition: flag(static)
+      cc-options: -static
+      ld-options:
+      - -static
+      - -pthread
+
+flags:
+  static:
+    description: Static build
+    manual: true
+    default: false

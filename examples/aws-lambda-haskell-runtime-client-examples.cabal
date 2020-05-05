@@ -1,5 +1,11 @@
 cabal-version: 1.12
 
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: f59db825ae521192d10aa8505eab61fe5c816b595779e629975e1b2106a6affc
+
 name:           aws-lambda-haskell-runtime-client-examples
 version:        0.1.0.0
 synopsis:       AWS Lambda Haskell Runtime Client
@@ -29,12 +35,14 @@ executable api-gateway-exe
       Paths_aws_lambda_haskell_runtime_client_examples
   hs-source-dirs:
       api-gateway
-  ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
+  ghc-options: -O2 -rtsopts -threaded -Wall -with-rtsopts=-N
   build-depends:
       aws-lambda-haskell-runtime-client
     , base >=4.7 && <5
+    , dhall >=1.26.1 && <1.31
     , lens >=4.17.1 && <4.19
     , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
   if flag(static)
     cc-options: -static
     ld-options: -static -pthread
@@ -46,12 +54,14 @@ executable dhall-exe
       Paths_aws_lambda_haskell_runtime_client_examples
   hs-source-dirs:
       dhall
-  ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
+  ghc-options: -O2 -rtsopts -threaded -Wall -with-rtsopts=-N
   build-depends:
       aws-lambda-haskell-runtime-client
     , base >=4.7 && <5
-    , dhall >= 1.26.1 && < 1.31
+    , dhall >=1.26.1 && <1.31
+    , lens >=4.17.1 && <4.19
     , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
   if flag(static)
     cc-options: -static
     ld-options: -static -pthread
@@ -63,10 +73,12 @@ executable kinesis-exe
       Paths_aws_lambda_haskell_runtime_client_examples
   hs-source-dirs:
       kinesis
-  ghc-options: -threaded -rtsopts -O2 -with-rtsopts=-N
+  ghc-options: -O2 -rtsopts -threaded -Wall -with-rtsopts=-N
   build-depends:
       aws-lambda-haskell-runtime-client
     , base >=4.7 && <5
+    , dhall >=1.26.1 && <1.31
+    , lens >=4.17.1 && <4.19
     , monad-logger >=0.3.30 && <0.4
     , mtl >=2.2.2 && <2.3
   if flag(static)
@@ -80,11 +92,14 @@ executable s3-exe
       Paths_aws_lambda_haskell_runtime_client_examples
   hs-source-dirs:
       s3
-  ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
+  ghc-options: -O2 -rtsopts -threaded -Wall -with-rtsopts=-N
   build-depends:
       aws-lambda-haskell-runtime-client
     , base >=4.7 && <5
+    , dhall >=1.26.1 && <1.31
+    , lens >=4.17.1 && <4.19
     , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
   if flag(static)
     cc-options: -static
     ld-options: -static -pthread
@@ -96,11 +111,14 @@ executable sns-exe
       Paths_aws_lambda_haskell_runtime_client_examples
   hs-source-dirs:
       sns
-  ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
+  ghc-options: -O2 -rtsopts -threaded -Wall -with-rtsopts=-N
   build-depends:
       aws-lambda-haskell-runtime-client
     , base >=4.7 && <5
+    , dhall >=1.26.1 && <1.31
+    , lens >=4.17.1 && <4.19
     , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
   if flag(static)
     cc-options: -static
     ld-options: -static -pthread
