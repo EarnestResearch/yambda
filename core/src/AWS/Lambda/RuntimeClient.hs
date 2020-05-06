@@ -24,12 +24,9 @@ import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Logger
-import           Data.Aeson (ToJSON)
 import qualified Data.ByteString.Char8 as B
 import           Data.ByteString.Lazy as LB
 import           Data.Maybe
-import           Data.Text (Text)
-import           GHC.Generics
 import           System.Environment
 
 data RuntimeClient e r m =
