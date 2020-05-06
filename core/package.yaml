@@ -13,6 +13,9 @@ extra-source-files:
 - README.md
 - ChangeLog.md
 
+ghc-options:
+- -Wall
+
 dependencies:
 - aeson >=1.4.2 && <1.5
 - base >=4.7 && <5
@@ -42,10 +45,7 @@ tests:
     generated-other-modules:
       - Paths_aws_lambda_haskell_runtime_client
     ghc-options:
-    - -Wall
     - -threaded
-    - -O2
-    - -rtsopts
     - -with-rtsopts=-N
     dependencies:
     - HUnit >=1.6.0.0 && <1.7

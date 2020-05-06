@@ -5,12 +5,8 @@ module AWS.Lambda.Encoding where
 import           Control.Exception
 import qualified Data.Aeson as A
 import           Data.Bifunctor
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Char8 as BS8
 import qualified Data.ByteString.Lazy as LB
-import           Data.Coerce
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
 import qualified Data.Text.Lazy as LT
 import qualified Data.Text.Lazy.Encoding as LTE
 import qualified Dhall as D

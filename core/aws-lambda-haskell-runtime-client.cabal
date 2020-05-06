@@ -4,7 +4,7 @@ cabal-version: 2.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0c8b430d6bb13fc46f2a1bab9154f12d746b12949ae32dd3e2917cbcb4740752
+-- hash: 498c222c86dec9b35e2d8585b3df53fce7198d3baab87c7bf2467badd6f8e022
 
 name:           aws-lambda-haskell-runtime-client
 version:        0.1.0.1
@@ -50,6 +50,7 @@ library
       Paths_aws_lambda_haskell_runtime_client
   hs-source-dirs:
       src
+  ghc-options: -Wall
   build-depends:
       aeson >=1.4.2 && <1.5
     , base >=4.7 && <5
@@ -81,7 +82,7 @@ test-suite aws-lambda-haskell-runtime-client-test
       Paths_aws_lambda_haskell_runtime_client
   hs-source-dirs:
       test
-  ghc-options: -Wall -threaded -O2 -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -threaded -with-rtsopts=-N
   build-depends:
       HUnit >=1.6.0.0 && <1.7
     , aeson >=1.4.2 && <1.5
