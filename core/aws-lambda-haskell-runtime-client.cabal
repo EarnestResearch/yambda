@@ -4,7 +4,7 @@ cabal-version: 2.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1c9e2809aa2b2e49b396f0b888af558ba8a178aa51e2c17a1e831fc6650cbd81
+-- hash: 39be669a190aa90478ab32fff7e07f91a1a65452ef30776added70ab14993352
 
 name:           aws-lambda-haskell-runtime-client
 version:        0.1.0.1
@@ -22,6 +22,14 @@ build-type:     Simple
 extra-source-files:
     README.md
     ChangeLog.md
+data-files:
+    api-gateway-v2-request-base64-body.json
+    api-gateway-v2-request-json-body.json
+    api-gateway-v2-request-text-body.json
+    api-gateway-v2-response-base64-body.json
+    api-gateway-v2-response-json-body.json
+    api-gateway-v2-response-text-body.json
+data-dir:       data
 
 source-repository head
   type: git
@@ -74,6 +82,7 @@ test-suite aws-lambda-haskell-runtime-client-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      AWS.Lambda.Event.APIGatewayV2Spec
       AWS.Lambda.Event.KinesisSpec
       AWS.Lambda.Event.S3Spec
       AWS.Lambda.RuntimeClientSpec
