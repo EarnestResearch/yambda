@@ -1,16 +1,19 @@
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE DerivingVia        #-}
+{-# LANGUAGE LambdaCase         #-}
 {-# LANGUAGE RecordWildCards    #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell    #-}
 
-module AWS.Lambda.KinesisDataStreamsEvent where
+module AWS.Lambda.Event.Kinesis where
 
 import AWS.Lambda.Encoding
+import AWS.Lambda.Event.JSON
 import Control.Lens
 import Data.Aeson
 import Data.Text (Text)
 import GHC.Generics
+
 
 data Kinesis = Kinesis
   { _partitionKey         :: Text
@@ -19,15 +22,16 @@ data Kinesis = Kinesis
   , _sequenceNumber       :: Text
   } deriving (Eq, Generic, Show)
 
-instance ToJSON Kinesis where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify }
 
-instance FromJSON Kinesis where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = modify }
+instance HasEventJSONOptions Kinesis where
+  getEventJsonOptions = defaultOptions
+    { fieldLabelModifier =
+        \case "_payload" -> "data"
+              k          -> drop 1 k
+    }
 
-modify :: String -> String
-modify "_payload" = "data"
-modify k          = drop 1 k
+deriving via EventJSON Kinesis instance ToJSON Kinesis
+deriving via EventJSON Kinesis instance FromJSON Kinesis
 
 
 data Record = Record
@@ -41,26 +45,25 @@ data Record = Record
   , _awsRegion         :: Text
   } deriving (Eq, Generic, Show)
 
-instance ToJSON Record where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 1 }
+instance HasEventJSONOptions Record
+deriving via EventJSON Record instance ToJSON Record
+deriving via EventJSON Record instance FromJSON Record
 
-instance FromJSON Record where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
 
 newtype KinesisDataStreamsEvent = KinesisDataStreamsEvent { _records :: [Record] }
   deriving (Eq, Generic, Show)
   deriving LambdaDecode via (LambdaFromJSON KinesisDataStreamsEvent)
   deriving LambdaEncode via (LambdaToJSON KinesisDataStreamsEvent)
 
-instance ToJSON KinesisDataStreamsEvent where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify' }
+instance HasEventJSONOptions KinesisDataStreamsEvent where
+  getEventJsonOptions = defaultOptions
+    { fieldLabelModifier =
+        \case "_records" -> "Records"
+              k          -> drop 1 k
+    }
 
-instance FromJSON KinesisDataStreamsEvent where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = modify' }
-
-modify' :: String -> String
-modify' "_records" = "Records"
-modify' k          = drop 1 k
+deriving via EventJSON KinesisDataStreamsEvent instance ToJSON KinesisDataStreamsEvent
+deriving via EventJSON KinesisDataStreamsEvent instance FromJSON KinesisDataStreamsEvent
 
 
 makeLenses ''Kinesis

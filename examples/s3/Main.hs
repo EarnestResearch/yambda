@@ -1,7 +1,7 @@
 module Main where
 
+import AWS.Lambda.Event.S3
 import AWS.Lambda.Handler
-import AWS.Lambda.S3Event
 import Control.Monad.Logger
 
 main :: IO ()

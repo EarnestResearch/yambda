@@ -1,11 +1,14 @@
-{-# LANGUAGE DeriveAnyClass  #-}
-{-# LANGUAGE DeriveGeneric   #-}
-{-# LANGUAGE DerivingVia     #-}
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveAnyClass     #-}
+{-# LANGUAGE DeriveGeneric      #-}
+{-# LANGUAGE DerivingVia        #-}
+{-# LANGUAGE LambdaCase         #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE TemplateHaskell    #-}
 
-module AWS.Lambda.S3Event where
+module AWS.Lambda.Event.S3 where
 
 import AWS.Lambda.Encoding
+import AWS.Lambda.Event.JSON
 import Control.Lens
 import Data.Aeson
 import Data.HashMap.Strict
@@ -17,15 +20,15 @@ newtype S3Event = S3Event { _records :: [Record] }
   deriving LambdaDecode via (LambdaFromJSON S3Event)
   deriving LambdaEncode via (LambdaToJSON S3Event)
 
-instance ToJSON S3Event where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify }
+instance HasEventJSONOptions S3Event where
+  getEventJsonOptions = defaultOptions
+    { fieldLabelModifier =
+        \case "_records" -> "Records"
+              k          -> drop 1 k
+    }
 
-instance FromJSON S3Event where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = modify }
-
-modify :: String -> String
-modify "_records" = "Records"
-modify k          = drop 1 k
+deriving via EventJSON S3Event instance ToJSON S3Event
+deriving via EventJSON S3Event instance FromJSON S3Event
 
 
 data Record = Record
@@ -41,11 +44,9 @@ data Record = Record
   , _glacierEventData  :: Maybe (HashMap Text Value)
   } deriving (Eq, Generic, Show)
 
-instance ToJSON Record where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 1 }
-
-instance FromJSON Record where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
+instance HasEventJSONOptions Record
+deriving via EventJSON Record instance ToJSON Record
+deriving via EventJSON Record instance FromJSON Record
 
 
 data S3 = S3
@@ -55,15 +56,15 @@ data S3 = S3
   , _s3Object        :: S3Object
   } deriving (Eq, Generic, Show)
 
-instance ToJSON S3 where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = modify' }
+instance HasEventJSONOptions S3 where
+  getEventJsonOptions = defaultOptions
+    { fieldLabelModifier =
+        \case "_s3Object" -> "object"
+              k           -> drop 1 k
+    }
 
-instance FromJSON S3 where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = modify' }
-
-modify':: String -> String
-modify' "_s3Object" = "object"
-modify' k           = drop 1 k
+deriving via EventJSON S3 instance ToJSON S3
+deriving via EventJSON S3 instance FromJSON S3
 
 
 data Bucket = Bucket
@@ -72,11 +73,9 @@ data Bucket = Bucket
   , _ownerIdentity :: Maybe (HashMap Text Text)
   } deriving (Eq, Generic, Show)
 
-instance ToJSON Bucket where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 1 }
-
-instance FromJSON Bucket where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
+instance HasEventJSONOptions Bucket
+deriving via EventJSON Bucket instance ToJSON Bucket
+deriving via EventJSON Bucket instance FromJSON Bucket
 
 
 data S3Object = S3Object
@@ -87,11 +86,9 @@ data S3Object = S3Object
   , _sequencer :: Text
   } deriving (Eq, Generic, Show)
 
-instance ToJSON S3Object where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 1 }
-
-instance FromJSON S3Object where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
+instance HasEventJSONOptions S3Object
+deriving via EventJSON S3Object instance ToJSON S3Object
+deriving via EventJSON S3Object instance FromJSON S3Object
 
 
 makeLenses ''S3Event
