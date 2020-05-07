@@ -1,10 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
 
-module AWS.Lambda.Handler
-  ( handler
-  , handle
-  ) where
+module AWS.Lambda.Handler (handler) where
 
 import           AWS.Lambda.Encoding
 import           AWS.Lambda.RuntimeClient
@@ -25,17 +22,17 @@ handler
   -> m ()
 handler f = forever $ do
   client <- runtimeClient
-  forever $ handle client f
+  forever $ handleOne client f
 
 
 -- | Handle single event with a given runtime client and a callback
-handle
+handleOne
   :: MonadUnliftIO m
   => MonadLogger m
   => RuntimeClient e r m
   -> (e -> m r)
   -> m ()
-handle RuntimeClient{..} f =
+handleOne RuntimeClient{..} f =
   tryHandleEvent `catchAny` \e ->
     logErrorN (tshow e) -- on this level there's no event ID to report but try to at least log
 
