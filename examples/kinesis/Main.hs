@@ -1,8 +1,9 @@
 module Main where
 
+import AWS.Lambda.Event.Kinesis
 import AWS.Lambda.Handler
-import AWS.Lambda.KinesisDataStreamsEvent
 import Control.Monad.Logger
+
 
 main :: IO ()
 main = runStderrLoggingT $ handler echo

@@ -1,7 +1,7 @@
 module Main where
 
+import AWS.Lambda.Event.SNS
 import AWS.Lambda.Handler
-import AWS.Lambda.SNSEvent
 import Control.Monad.Logger
 
 main :: IO ()

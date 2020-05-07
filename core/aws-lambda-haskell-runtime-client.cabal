@@ -4,7 +4,7 @@ cabal-version: 2.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9317b31ca102a716cd0a4222e032c9cddad9d7163c63f885dec5e108fd38b73e
+-- hash: 068493da83b636676b3f0ae6cec26078338eb53b02cb64226f8d0984431bcfe5
 
 name:           aws-lambda-haskell-runtime-client
 version:        0.1.0.1
@@ -34,15 +34,15 @@ flag static
 
 library
   exposed-modules:
-      AWS.Lambda.APIGatewayInputEvent
-      AWS.Lambda.APIGatewayOutputEvent
       AWS.Lambda.Encoding
+      AWS.Lambda.Event.APIGateway
+      AWS.Lambda.Event.JSON
+      AWS.Lambda.Event.Kinesis
+      AWS.Lambda.Event.S3
+      AWS.Lambda.Event.SNS
       AWS.Lambda.Handler
       AWS.Lambda.HttpClient
-      AWS.Lambda.KinesisDataStreamsEvent
       AWS.Lambda.RuntimeClient
-      AWS.Lambda.S3Event
-      AWS.Lambda.SNSEvent
       AWS.Lambda.Types
   other-modules:
       Paths_aws_lambda_haskell_runtime_client
@@ -73,10 +73,9 @@ test-suite aws-lambda-haskell-runtime-client-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      AWS.Lambda.KinesisDataStreamsEventSpec
-      AWS.Lambda.KinesisSpec
+      AWS.Lambda.Event.KinesisSpec
+      AWS.Lambda.Event.S3Spec
       AWS.Lambda.RuntimeClientSpec
-      AWS.Lambda.S3EventSpec
       AWS.Lambda.TestHttpClient
       Paths_aws_lambda_haskell_runtime_client
   autogen-modules:
