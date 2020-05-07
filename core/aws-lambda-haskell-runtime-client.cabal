@@ -4,7 +4,7 @@ cabal-version: 2.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 068493da83b636676b3f0ae6cec26078338eb53b02cb64226f8d0984431bcfe5
+-- hash: 1c9e2809aa2b2e49b396f0b888af558ba8a178aa51e2c17a1e831fc6650cbd81
 
 name:           aws-lambda-haskell-runtime-client
 version:        0.1.0.1
@@ -36,6 +36,7 @@ library
   exposed-modules:
       AWS.Lambda.Encoding
       AWS.Lambda.Event.APIGateway
+      AWS.Lambda.Event.APIGatewayV2
       AWS.Lambda.Event.JSON
       AWS.Lambda.Event.Kinesis
       AWS.Lambda.Event.S3
