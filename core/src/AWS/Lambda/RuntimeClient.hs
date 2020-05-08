@@ -112,7 +112,10 @@ parseEventID response = do
 parseEvent ::
   (MonadIO m, MonadLogger m, HttpResponse a ByteString, LambdaDecode e) =>
   a -> m (Either String e)
-parseEvent response = liftIO $ decodeInput (response ^. responseBody)
+parseEvent response = do
+  let b = response ^. responseBody
+  evt <- liftIO $ decodeInput b
+  pure $ either (\e -> Left (show (e, b))) Right evt -- capture body that failed to parse in the err message
 
 postResponse' ::
   (HttpResponse a ByteString, MonadIO m, MonadLogger m, LambdaEncode r) =>

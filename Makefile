@@ -15,14 +15,14 @@ clean: ## remove all cached files
 
 sam-tests: sam-template-all package-all ## compile, test, and invoke each example with a generated event
 	sam local generate-event apigateway aws-proxy | \
-		sam local invoke "APIGatewayEcho" -t build/api-gateway.yaml
+		sam local invoke "APIGatewayEcho" -t build/api-gateway.yaml --event -
 	sam local generate-event kinesis get-records | \
-		sam local invoke "KinesisEcho" -t build/kinesis.yaml
+		sam local invoke "KinesisEcho" -t build/kinesis.yaml --event -
 	sam local generate-event s3 delete | \
-		sam local invoke "S3Echo" -t build/s3.yaml
+		sam local invoke "S3Echo" -t build/s3.yaml --event -
 	sam local generate-event sns notification | \
-		sam local invoke "SNSEcho" -t build/sns.yaml
-	sam local invoke "DhallEcho" -t build/dhall.yaml -e events/example.json
+		sam local invoke "SNSEcho" -t build/sns.yaml --event -
+	sam local invoke "DhallEcho" -t build/dhall.yaml --event events/example.json
 
 .PHONY: package-all
 package-all: build

@@ -4,5 +4,8 @@ packages:
   - core
   - examples
 
+# Disable by default as it breaks haskell tooling (e.g. emacs integration)
+# It is enabled explicitly in the Makefile when we run an "official" build
 docker:
+  enable: false
   repo: "lambci/lambda:build-provided"
