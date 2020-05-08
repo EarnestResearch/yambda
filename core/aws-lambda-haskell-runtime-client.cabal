@@ -4,7 +4,7 @@ cabal-version: 2.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f6ffc5364a9186b65ada2248e890ec2b4f14af2e70166231aa10d7948f808842
+-- hash: 6dfef988ca8c2598f861f24efe839d5072eee900e035778a086829fc8cb21d5f
 
 name:           aws-lambda-haskell-runtime-client
 version:        0.1.0.1
@@ -29,6 +29,7 @@ data-files:
     api-gateway-v2-response-base64-body.json
     api-gateway-v2-response-json-body.json
     api-gateway-v2-response-text-body.json
+    kinesis-get-records.json
     s3-delete.json
 data-dir:       data
 
