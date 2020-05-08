@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 module AWS.Lambda.Handler (handler) where
 
@@ -7,7 +8,7 @@ import           AWS.Lambda.Encoding
 import           AWS.Lambda.RuntimeClient
 import           Control.Monad
 import           Control.Monad.Logger
-import qualified Data.Aeson as A
+import qualified Data.Aeson as J
 import qualified Data.Text as T
 import           UnliftIO hiding (handle)
 
@@ -16,6 +17,7 @@ import           UnliftIO hiding (handle)
 handler
   :: MonadUnliftIO m
   => MonadLogger m
+  => Show e
   => LambdaDecode e
   => LambdaEncode r
   => (e -> m r)
@@ -29,20 +31,24 @@ handler f = forever $ do
 handleOne
   :: MonadUnliftIO m
   => MonadLogger m
+  => Show e
   => RuntimeClient e r m
   -> (e -> m r)
   -> m ()
 handleOne RuntimeClient{..} f =
   tryHandleEvent `catchAny` \e ->
-    logErrorN (tshow e) -- on this level there's no event ID to report but try to at least log
+    $logErrorSH e -- on this level there's no event ID to report but try to at least log
 
   where
     tshow = T.pack . show
 
     tryHandleEvent = do
-      Event{..} <- getNextEvent
+      evt@Event{..} <- getNextEvent
 
-      handleAny (postError eventID . Error "Call failed" . A.String . tshow) $
+      handleAny (\e -> do
+                    $logErrorSH (evt, e) -- add full event and an error to lambda logs for debugging
+                    (postError eventID . Error "Call failed" . J.String . tshow) e
+                ) $
         case eventBody of
           Right val -> f val >>= postResponse eventID
-          Left e    -> postError eventID (Error "Failed to parse event" $ (A.String . T.pack) e)
+          Left e    -> postError eventID (Error "Failed to parse event" $ (J.String . T.pack) e)

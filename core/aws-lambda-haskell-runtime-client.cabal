@@ -4,7 +4,7 @@ cabal-version: 2.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 39be669a190aa90478ab32fff7e07f91a1a65452ef30776added70ab14993352
+-- hash: f6ffc5364a9186b65ada2248e890ec2b4f14af2e70166231aa10d7948f808842
 
 name:           aws-lambda-haskell-runtime-client
 version:        0.1.0.1
@@ -29,6 +29,7 @@ data-files:
     api-gateway-v2-response-base64-body.json
     api-gateway-v2-response-json-body.json
     api-gateway-v2-response-text-body.json
+    s3-delete.json
 data-dir:       data
 
 source-repository head
