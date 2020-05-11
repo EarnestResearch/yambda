@@ -24,6 +24,7 @@
 -}
 module AWS.Lambda.Event.APIGatewayV2 where
 
+import           AWS.Lambda.Encoding
 import           AWS.Lambda.Event.JSON
 import           Control.Lens
 import           Data.Aeson
@@ -78,10 +79,16 @@ data HTTPRequest b = HTTPRequest
 instance HasEventJSONOptions (HTTPRequest b)
 
 deriving via EventJSON (HTTPRequest b)
-  instance (ToJSON b => ToJSON (HTTPRequest b))
+  instance ToJSON b => ToJSON (HTTPRequest b)
 
 deriving via EventJSON (HTTPRequest b)
-  instance (FromJSON b => FromJSON (HTTPRequest b))
+  instance FromJSON b => FromJSON (HTTPRequest b)
+
+deriving via LambdaFromJSON (HTTPRequest b)
+  instance FromJSON b => LambdaDecode (HTTPRequest b)
+
+deriving via LambdaToJSON (HTTPRequest b)
+  instance ToJSON b => LambdaEncode (HTTPRequest b)
 
 
 -- | Request body passed as a base64 encoded string
@@ -205,6 +212,12 @@ deriving via EventJSON (HTTPResponse b)
 
 deriving via EventJSON (HTTPResponse b)
   instance (FromJSON b => FromJSON (HTTPResponse b))
+
+deriving via LambdaFromJSON (HTTPResponse b)
+  instance FromJSON b => LambdaDecode (HTTPResponse b)
+
+deriving via LambdaToJSON (HTTPResponse b)
+  instance ToJSON b => LambdaEncode (HTTPResponse b)
 
 
 -- Generate TH lenses

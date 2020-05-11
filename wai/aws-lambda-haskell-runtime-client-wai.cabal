@@ -1,0 +1,57 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 045fe9152c42505be304d71d2d9752512c0dbcfd00308a1790de7fcb56fca773
+
+name:           aws-lambda-haskell-runtime-client-wai
+version:        0.1.0.0
+synopsis:       AWS Lambda Haskell Runtime Client' WAI bindings
+description:    Please see the README on GitHub at <https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme>
+category:       AWS
+homepage:       https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme
+bug-reports:    https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client/issues
+author:         Earnest research team
+maintainer:     dcq-team@earnestresearch.com
+copyright:      Earnest Research 2019
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client
+
+flag static
+  description: Static build
+  manual: True
+  default: False
+
+library
+  exposed-modules:
+      AWS.Lambda.Wai.Encoding
+      AWS.Lambda.Wai.Handler
+  other-modules:
+      Paths_aws_lambda_haskell_runtime_client_wai
+  hs-source-dirs:
+      src
+  build-depends:
+      aeson >=1.4.2 && <1.5
+    , aws-lambda-haskell-runtime-client
+    , base >=4.7 && <5
+    , base64 >0.4
+    , bytestring >=0.10.8 && <0.11
+    , http-types >0.12
+    , lens >=4.17.1 && <4.19
+    , monad-logger >=0.3.30 && <0.4
+    , mtl >=2.2.2 && <2.3
+    , text >=1.2.3 && <1.3
+    , unliftio >0.2.12
+    , unordered-containers >=0.2.10 && <0.3
+    , wai >=3.2 && <4.0
+  default-language: Haskell2010
