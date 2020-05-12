@@ -205,6 +205,17 @@ data HTTPResponse b = HTTPResponse
     }
     deriving (Generic, Eq, Show)
 
+httpResponse
+  :: Int
+  -> HTTPResponse a
+httpResponse sc = HTTPResponse sc
+  Nothing
+  Nothing
+  Nothing
+  Nothing
+  Nothing
+
+
 instance HasEventJSONOptions (HTTPResponse b)
 
 deriving via EventJSON (HTTPResponse b)
