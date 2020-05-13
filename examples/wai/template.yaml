@@ -1,0 +1,15 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  WAI adapter example
+
+  A simple WAI web service wrapped as an API GW Lambda function
+Resources:
+  LambdaWaiTest:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: provided
+      Runtime: provided
+      CodeUri: '{{ZIP_FILE_PATH}}'
+      Description: >
+          An example of using WAI adapter to serve a simple web API via an API GW / Lambda

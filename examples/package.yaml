@@ -19,7 +19,6 @@ ghc-options:
 dependencies:
 - aws-lambda-haskell-runtime-client
 - base >=4.7 && <5
-- dhall >=1.26.1 && <1.31
 - lens >=4.17.1 && <4.19
 - monad-logger >=0.3.30 && <0.4
 - mtl >=2.2.2 && <2.3
@@ -38,6 +37,8 @@ executables:
   dhall-exe:
     main: Main.hs
     source-dirs: dhall
+    dependencies:
+      - dhall >=1.26.1 && <1.31
     when:
     - condition: flag(static)
       cc-options: -static
@@ -68,6 +69,23 @@ executables:
   sns-exe:
     main: Main.hs
     source-dirs: sns
+    when:
+    - condition: flag(static)
+      cc-options: -static
+      ld-options:
+      - -static
+      - -pthread
+
+  wai-exe:
+    main: Main.hs
+    source-dirs: wai
+    dependencies:
+      - aws-lambda-haskell-runtime-client-wai
+      - aeson >1.4
+      - servant >0.16
+      - servant-server >0.16
+      - text >1.2
+      - wai >3.2
     when:
     - condition: flag(static)
       cc-options: -static

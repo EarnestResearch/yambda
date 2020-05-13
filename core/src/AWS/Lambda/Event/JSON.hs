@@ -21,7 +21,9 @@ newtype EventJSON e = EventJSON e
 -- | Implement options for a type to get JSON derivations via EventJSON
 class HasEventJSONOptions a where
   getEventJsonOptions :: Options
-  getEventJsonOptions = defaultOptions { fieldLabelModifier = drop 1 } -- common default for our events
+  getEventJsonOptions = defaultOptions { fieldLabelModifier = drop 1
+                                       , omitNothingFields = True
+                                       } -- common default for our events
 
 
 instance

@@ -31,6 +31,7 @@ spec = describe "JSON decoding" $ do
   it "decode request from file, text body" testDecodeTextBodyRequestFromFile
   it "decode request from file, JSON body" testDecodeJsonBodyRequestFromFile
   it "decode request from file, base64 body" testDecodeBase64BodyRequestFromFile
+  it "decode request from file, minimum fields" testDecodeMinimalRequestFromFile
 
   it "decode response from file, text body" testDecodeTextBodyResponseFromFile
   it "decode response from file, JSON body" testDecodeJsonBodyResponseFromFile
@@ -41,7 +42,7 @@ testDecodeTextBodyRequestFromFile :: Expectation
 testDecodeTextBodyRequestFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-request-text-body.json"
   reqBytes <- LB.readFile fname
-  let Just req = decode @(HTTPRequest Text) reqBytes
+  let Just req = decode @HTTPRequest reqBytes
   req `shouldBe` mockRequest "Hello from Lambda"
 
 
@@ -49,23 +50,33 @@ testDecodeJsonBodyRequestFromFile :: Expectation
 testDecodeJsonBodyRequestFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-request-json-body.json"
   reqBytes <- LB.readFile fname
-  let Just req = decode @(HTTPRequest MockBody) reqBytes
-  req `shouldBe` mockRequest (MockBody "bodyval" 123)
+  let Just req = decode @HTTPRequest reqBytes
+  req `shouldBe` mockRequest "{\"bodykey1\":\"bodyval\",\"bodykey2\":123}"
+  requestBodyJSON @MockBody req `shouldBe` Right (MockBody "bodyval" 123)
 
 
 testDecodeBase64BodyRequestFromFile :: Expectation
 testDecodeBase64BodyRequestFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-request-base64-body.json"
   reqBytes <- LB.readFile fname
-  let Just req = decode @(HTTPRequest Base64EncodedBody) reqBytes
-  req `shouldBe` (mockRequest (Base64EncodedBody "base64val") & isBase64Encoded .~ True)
+  let Just req = decode @HTTPRequest reqBytes
+  req `shouldBe` (mockRequest "YmFzZTY0dmFs" & isBase64Encoded .~ True)
+  requestBodyText req `shouldBe` Right "base64val"
+
+
+testDecodeMinimalRequestFromFile :: Expectation
+testDecodeMinimalRequestFromFile = do
+  fname <- Paths.getDataFileName "api-gateway-v2-request-minimal.json"
+  reqBytes <- LB.readFile fname
+  let Just req = decode @HTTPRequest reqBytes
+  req `shouldBe` mockMinimalRequest
 
 
 testDecodeTextBodyResponseFromFile :: Expectation
 testDecodeTextBodyResponseFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-response-text-body.json"
   reqBytes <- LB.readFile fname
-  let Just req = decode @(HTTPResponse Text) reqBytes
+  let Just req = decode @HTTPResponse reqBytes
   req `shouldBe` mockResponse "Hello from Lambda!"
 
 
@@ -73,30 +84,61 @@ testDecodeJsonBodyResponseFromFile :: Expectation
 testDecodeJsonBodyResponseFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-response-json-body.json"
   reqBytes <- LB.readFile fname
-  let Just req = decode @(HTTPResponse MockBody) reqBytes
-  req `shouldBe` mockResponse (MockBody "bodyval" 123)
+  let Just req = decode @HTTPResponse reqBytes
+  req `shouldBe` mockResponse "{\"bodykey1\":\"bodyval\",\"bodykey2\":123}"
 
 
 testDecodeBase64BodyResponseFromFile :: Expectation
 testDecodeBase64BodyResponseFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-response-base64-body.json"
   reqBytes <- LB.readFile fname
-  let Just req = decode @(HTTPResponse Base64EncodedBody) reqBytes
-  req `shouldBe` (mockResponse (Base64EncodedBody "base64val") & isBase64Encoded ?~ True)
+  let Just req = decode @HTTPResponse reqBytes
+  req `shouldBe` (mockResponse "YmFzZTY0dmFs" & isBase64Encoded ?~ True)
+
+
+mockMinimalRequest :: HTTPRequest
+mockMinimalRequest = HTTPRequest
+  { _version = "2.0"
+  , _routeKey = "ANY /"
+  , _rawPath = "/"
+  , _rawQueryString = ""
+  , _cookies = Nothing
+  , _headers = Map.fromList [("accept","*/*"),("content-length","0"),("host","00aabbccdd.execute-api.us-east-1.amazonaws.com"),("user-agent","curl/7.70.0"),("x-amzn-trace-id","Root=1-5ebd8107-98d5198d2e2923afe514a5e3"),("x-forwarded-for","11.11.11.11"),("x-forwarded-port","443"),("x-forwarded-proto","https")]
+  , _queryStringParameters = Nothing
+  , _pathParameters = Nothing
+  , _requestContext = HTTPRequestContext {_routeKey = "ANY /"
+  , _stage = "$default"
+  , _accountId = "999999999999"
+  , _requestId = "MiEZHi17IAMESiw="
+  , _authorizer = Nothing
+  , _apiId = "aabbccddee"
+  , _domainName = "aabbccddee.execute-api.us-east-1.amazonaws.com"
+  , _domainPrefix = "aabbccddee"
+  , _time = "14/May/2020:17:33:59 +0000"
+  , _timeEpoch = 1589477639097
+  , _http = HTTPRequestContextHTTPDescription {_method = "GET"
+  , _path = "/"
+  , _protocol = "HTTP/1.1"
+  , _sourceIp = "11.11.11.11"
+  , _userAgent = "curl/7.70.0"}}
+  , _stageVariables = Nothing
+  , _body = Nothing
+  , _isBase64Encoded = False
+  }
 
 
 mockRequest
-  :: b
-  -> HTTPRequest b
+  :: Text
+  -> HTTPRequest
 mockRequest b = HTTPRequest
   { _version = "2.0"
   , _routeKey = "$default"
   , _rawPath = "/my/path"
   , _rawQueryString = "parameter1=value1&parameter1=value2&parameter2=value"
-  , _cookies = ["cookie1","cookie2"]
+  , _cookies = Just ["cookie1","cookie2"]
   , _headers = Map.fromList [("Header1","value1"),("Header2","value2")]
-  , _queryStringParameters = Map.fromList [("parameter1","value1,value2"),("parameter2","value")]
-  , _pathParameters = Map.fromList [("parameter1","value1")]
+  , _queryStringParameters = Just $ Map.fromList [("parameter1","value1,value2"),("parameter2","value")]
+  , _pathParameters = Just $ Map.fromList [("parameter1","value1")]
   , _requestContext = HTTPRequestContext
     { _routeKey = "$default"
     , _stage = "$default"
@@ -121,15 +163,15 @@ mockRequest b = HTTPRequest
       , _userAgent = "agent"
       }
     }
-  , _stageVariables = Map.fromList [("stageVariable1","value1"), ("stageVariable2","value2")]
-  , _body = b
+  , _stageVariables = Just $ Map.fromList [("stageVariable1","value1"), ("stageVariable2","value2")]
+  , _body = Just b
   , _isBase64Encoded = False
   }
 
 
 mockResponse
-  :: b
-  -> HTTPResponse b
+  :: Text
+  -> HTTPResponse
 mockResponse b = HTTPResponse
   { _statusCode = 200
   , _headers = Just $ Map.fromList [ ("header1", "headerval1"), ("header2", "headerval2") ]

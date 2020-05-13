@@ -12,6 +12,9 @@
      Note that this conversion is only an approximation and
      many things possible in HTTP are not representable
      (e.g. streaming).
+
+     To debug requests/responses please enable "DEBUG" environmental
+     variable in your lambda.
 -}
 module AWS.Lambda.Wai.Handler
   ( handleWaiApplication
@@ -25,8 +28,13 @@ import           Control.Lens
 import           Control.Monad
 import           Control.Monad.Logger
 import qualified Data.Aeson as JSON
+import qualified Data.ByteString.Lazy as LB
+import           Data.Maybe
+import           Data.Text (Text)
+import qualified Data.Text.Encoding as TE
 import           Network.Wai
 import           Network.Wai.Internal (ResponseReceived (..))
+import           System.Environment
 import           UnliftIO
 
 
@@ -38,39 +46,48 @@ handleWaiApplication
   => Application
   -> m ()
 handleWaiApplication waiApp = do
+  debugMode <- isJust <$> liftIO (lookupEnv "DEBUG")
+
   client <- runtimeClient
-  forever $ tryHandleEvent client `catchAny` \e ->
+  forever $ tryHandleEvent debugMode client `catchAny` \e ->
       $logErrorSH e -- error here means we failed to decode request, can't respond
 
   where
+    toJsonText :: JSON.ToJSON a => a -> Text
+    toJsonText = TE.decodeUtf8 . LB.toStrict . JSON.encode
+
     tryHandleEvent
-      :: RuntimeClient (HTTPRequest JSON.Value) (HTTPResponse JSON.Value) m
+      :: Bool
+      -> RuntimeClient HTTPRequest HTTPResponse m
       -> m ()
-    tryHandleEvent RuntimeClient{..} = do
+    tryHandleEvent debugMode RuntimeClient{..} = do
       evt@Event{..} <- getNextEvent
+      when debugMode $ $logDebug $ toJsonText evt
 
       let onError e = do
-            $logErrorSH (evt, e) -- add full event and an error to lambda logs for debugging
+            $logError $ toJsonText (show e, evt) -- add full event and an error to lambda logs for debugging
             postResponse eventID serverErrorResponse
 
       handleAny onError $
         case eventBody of
-          Right req -> handleWaiApp req (postResponse eventID)
+          Right req -> handleWaiApp debugMode req (postResponse eventID)
           Left e    -> onError e -- note that this should never happen as we ask for a generic Value body
 
 
     handleWaiApp
-      :: HTTPRequest JSON.Value
-      -> (HTTPResponse JSON.Value -> m ())
+      :: Bool
+      -> HTTPRequest
+      -> (HTTPResponse -> m ())
       -> m ()
-    handleWaiApp req postLambdaResponse = void $ withRunInIO $ \rio -> do
+    handleWaiApp debugMode req postLambdaResponse = void $ withRunInIO $ \rio -> do
       waiReq <- gwReqToWai req
       waiApp  -- Request -> (Response -> IO ResponseReceived) -> IO ResponseReceived
         waiReq
         (\httpRes -> do lamRes <- waiResToGw httpRes
+                        when debugMode $ rio $ $logDebug $ toJsonText lamRes
                         rio $ postLambdaResponse lamRes
                         pure ResponseReceived)
 
 
-serverErrorResponse :: HTTPResponse JSON.Value
-serverErrorResponse = httpResponse 500 & body ?~ JSON.String "Server error"
+serverErrorResponse :: HTTPResponse
+serverErrorResponse = httpResponse 500 & body ?~ "Server error"

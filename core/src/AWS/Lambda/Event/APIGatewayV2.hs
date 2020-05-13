@@ -8,6 +8,8 @@
 {-# LANGUAGE FunctionalDependencies    #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE OverloadedLabels          #-}
+{-# LANGUAGE OverloadedStrings         #-}
+{-# LANGUAGE RecordWildCards           #-}
 {-# LANGUAGE StandaloneDeriving        #-}
 {-# LANGUAGE StrictData                #-}
 {-# LANGUAGE TemplateHaskell           #-}
@@ -28,12 +30,15 @@ import           AWS.Lambda.Encoding
 import           AWS.Lambda.Event.JSON
 import           Control.Lens
 import           Data.Aeson
-import           Data.Aeson.Types
+import           Data.Bifunctor
+import qualified Data.ByteString as B
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Lazy as LB
 import           Data.Map.Strict (Map)
 import           Data.Text (Text)
+import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
+import qualified Data.Text.Encoding.Base64 as TB64
 import           GHC.Generics
 
 
@@ -53,69 +58,66 @@ import           GHC.Generics
 -}
 
 -- | Request sent by API GW
-data HTTPRequest b = HTTPRequest
+data HTTPRequest = HTTPRequest
     { _version               :: Text
     , _routeKey              :: Text
     , _rawPath               :: Text
     , _rawQueryString        :: Text
-    , _cookies               :: [Text]
+    , _cookies               :: Maybe [Text]
     , _headers               :: Map Text Text
-    , _queryStringParameters :: Map Text Text
-    , _pathParameters        :: Map Text Text
+    , _queryStringParameters :: Maybe (Map Text Text)
+    , _pathParameters        :: Maybe (Map Text Text)
     , _requestContext        :: HTTPRequestContext
-    , _stageVariables        :: Map Text Text
-      -- | Some JSON-representable body.
-      --   You can use any custom JSON-encoded type if you know
-      --   you'll be getting JSON.
-      --   Use 'Base64EncodedBody' if you expect a base64 encoded binary.
-      --   If encoding can't be known upfront and you need to use
-      --   the value of '_isBase64Encoded' flag use 'Text' and add
-      --   custom conditional decoding.
-    , _body                  :: b
+    , _stageVariables        :: Maybe (Map Text Text)
+    , _body                  :: Maybe Text
     , _isBase64Encoded       :: Bool
     }
     deriving (Generic, Eq, Show)
 
-instance HasEventJSONOptions (HTTPRequest b)
+instance HasEventJSONOptions HTTPRequest
 
-deriving via EventJSON (HTTPRequest b)
-  instance ToJSON b => ToJSON (HTTPRequest b)
+deriving via EventJSON HTTPRequest
+  instance ToJSON HTTPRequest
 
-deriving via EventJSON (HTTPRequest b)
-  instance FromJSON b => FromJSON (HTTPRequest b)
+deriving via EventJSON HTTPRequest
+  instance FromJSON HTTPRequest
 
-deriving via LambdaFromJSON (HTTPRequest b)
-  instance FromJSON b => LambdaDecode (HTTPRequest b)
+deriving via LambdaFromJSON HTTPRequest
+  instance LambdaDecode HTTPRequest
 
-deriving via LambdaToJSON (HTTPRequest b)
-  instance ToJSON b => LambdaEncode (HTTPRequest b)
+deriving via LambdaToJSON HTTPRequest
+  instance LambdaEncode HTTPRequest
 
 
--- | Request body passed as a base64 encoded string
-newtype Base64EncodedBody
-  = Base64EncodedBody LB.ByteString
-  deriving (Generic, Eq, Show)
+-- | Try to get request body as Text (base64 decodes if needed)
+requestBodyText
+  :: HTTPRequest
+  -> Either Text Text
+requestBodyText HTTPRequest{..} = do
+  b <- maybe (Left "No body") Right _body
+  if _isBase64Encoded
+    then TB64.decodeBase64 b
+    else Right b
 
-instance ToJSON Base64EncodedBody where
-  toEncoding (Base64EncodedBody b)
-    = toEncoding
-    $ B64.encodeBase64 (LB.toStrict b)
 
-  toJSON (Base64EncodedBody b)
-    = toJSON
-    $ B64.encodeBase64 (LB.toStrict b)
+-- | Try to get request body as bytes (base64 decodes if needed)
+requestBodyBytes
+  :: HTTPRequest
+  -> Either Text B.ByteString
+requestBodyBytes HTTPRequest{..} = do
+  b <- maybe (Left "No body") Right _body
+  if _isBase64Encoded
+    then B64.decodeBase64 $ TE.encodeUtf8 b
+    else Right $ TE.encodeUtf8 b
 
-instance FromJSON Base64EncodedBody where
-  parseJSON v = do
-    jVal <- parseJSON v
-    let err = typeMismatch "base64 encoded string" v
 
-    case jVal
-      of String txt ->
-          case B64.decodeBase64 (TE.encodeUtf8 txt)
-            of Left _  -> err
-               Right b -> pure $ Base64EncodedBody (LB.fromStrict b)
-         _ -> err
+requestBodyJSON
+  :: FromJSON a
+  => HTTPRequest
+  -> Either Text a
+requestBodyJSON r@HTTPRequest{..} = do
+  b <- requestBodyBytes r
+  first T.pack $ eitherDecode $ LB.fromStrict b
 
 
 data HTTPRequestContext = HTTPRequestContext
@@ -194,12 +196,11 @@ deriving via EventJSON HTTPRequestContextHTTPDescription
 --   Note that API GW spec allows for simple 200 "some kind of JSON" responses,
 --   so in general you don't have to wrap everything up into a response type
 --   if that's all you need.
-data HTTPResponse b = HTTPResponse
+data HTTPResponse = HTTPResponse
     { _statusCode        :: Int
     , _headers           :: Maybe (Map Text Text)
     , _multiValueHeaders :: Maybe (Map Text [Text])
-    -- NOTE: AWS docs don't mention empty body but it may be needed for 204
-    , _body              :: Maybe b
+    , _body              :: Maybe Text
     , _isBase64Encoded   :: Maybe Bool
     , _cookies           :: Maybe [Text]
     }
@@ -207,7 +208,7 @@ data HTTPResponse b = HTTPResponse
 
 httpResponse
   :: Int
-  -> HTTPResponse a
+  -> HTTPResponse
 httpResponse sc = HTTPResponse sc
   Nothing
   Nothing
@@ -216,19 +217,19 @@ httpResponse sc = HTTPResponse sc
   Nothing
 
 
-instance HasEventJSONOptions (HTTPResponse b)
+instance HasEventJSONOptions HTTPResponse
 
-deriving via EventJSON (HTTPResponse b)
-  instance (ToJSON b => ToJSON (HTTPResponse b))
+deriving via EventJSON HTTPResponse
+  instance ToJSON HTTPResponse
 
-deriving via EventJSON (HTTPResponse b)
-  instance (FromJSON b => FromJSON (HTTPResponse b))
+deriving via EventJSON HTTPResponse
+  instance FromJSON HTTPResponse
 
-deriving via LambdaFromJSON (HTTPResponse b)
-  instance FromJSON b => LambdaDecode (HTTPResponse b)
+deriving via LambdaFromJSON HTTPResponse
+  instance LambdaDecode HTTPResponse
 
-deriving via LambdaToJSON (HTTPResponse b)
-  instance ToJSON b => LambdaEncode (HTTPResponse b)
+deriving via LambdaToJSON HTTPResponse
+  instance LambdaEncode HTTPResponse
 
 
 -- Generate TH lenses
