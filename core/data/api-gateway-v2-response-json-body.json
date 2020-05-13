@@ -10,5 +10,5 @@
     "header2": "headerval2"
   },
   "multiValueHeaders": { "mvheader1": ["mvh1", "mvh2"] },
-  "body": { "bodykey1": "bodyval", "bodykey2": 123 }
+  "body": "{\"bodykey1\":\"bodyval\",\"bodykey2\":123}"
 }

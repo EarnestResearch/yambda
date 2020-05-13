@@ -9,7 +9,7 @@ import Data.Aeson
 import Data.Text
 import GHC.Generics
 
-newtype EventID = EventID String deriving (Show)
+newtype EventID = EventID String deriving (Show, Generic, ToJSON)
 type ErrorMessage = String
 
 data Event a =
@@ -17,7 +17,9 @@ data Event a =
     eventID   :: EventID
   , eventBody :: Either String a
   } deriving (
-    Show
+    Show,
+    Generic,
+    ToJSON
   )
 
 data Error =

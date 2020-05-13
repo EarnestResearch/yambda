@@ -16,7 +16,6 @@ import           AWS.Lambda.Event.APIGatewayV2 hiding (rawQueryString)
 import           Control.Arrow ((***))
 import           Control.Exception
 import           Control.Lens
-import qualified Data.Aeson as J
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Builder as BB
@@ -47,19 +46,17 @@ instance Exception RemoteHostException
 
 -- | Converts API GW request to WAI HTTP request
 gwReqToWai
-  :: HTTPRequest J.Value
+  :: HTTPRequest
   -> IO W.Request
-gwReqToWai HTTPRequest{..} = do
+gwReqToWai r@HTTPRequest{..} = do
   remoteHost <- getRemoteHost
-
-  b <- requestBodyData
   isFirstRef <- newIORef False
 
   let  requestBody = do
          isFirst <- atomicModifyIORef' isFirstRef (False,)
-         pure $ if isFirst then b else B.empty
+         pure $ if isFirst then requestBodyData else B.empty
 
-       requestBodyLength = W.KnownLength (fromIntegral (B.length b))
+       requestBodyLength = W.KnownLength (fromIntegral (B.length requestBodyData))
 
   pure $ W.Request{..}
 
@@ -71,15 +68,8 @@ gwReqToWai HTTPRequest{..} = do
             (pure . Sock.addrAddress)
             (listToMaybe addrs)
 
-    requestBodyData :: IO B.ByteString
-    requestBodyData =
-      if _isBase64Encoded
-      then case J.fromJSON _body
-             of J.Error e -> throwIO $ JSONBodyException e
-                J.Success s -> either (throwIO . JSONBodyException . T.unpack)
-                                      pure
-                                      (B64.decodeBase64 (TE.encodeUtf8 s))
-      else pure $ LB.toStrict $ J.encode _body
+    requestBodyData :: B.ByteString
+    requestBodyData = either (const B.empty) id $ requestBodyBytes r
 
     requestMethod = TE.encodeUtf8 $ _requestContext ^. http . method
     httpVersion = H.http10
@@ -108,7 +98,7 @@ gwReqToWai HTTPRequest{..} = do
 -}
 waiResToGw
   :: W.Response
-  -> IO (HTTPResponse J.Value)
+  -> IO HTTPResponse
 waiResToGw waiRes = do
   (resBody, resBase64) <- resBodyEncoding
 
@@ -149,52 +139,44 @@ waiResToGw waiRes = do
         sc = H.statusCode $ W.responseStatus waiRes
 
 
-    resBodyEncoding :: IO (Maybe J.Value, Maybe Bool)
+    resBodyEncoding :: IO (Maybe Text, Maybe Bool)
     resBodyEncoding
-      | not canHaveBody                       = noBody
-      | ct == Just "text/plain"               = textBody
-      | ct == Just "application/json"         = jsonBody
-      | maybe False (B.isSuffixOf "+json") ct = jsonBody
-      | isJust ct                             = base64Body
-      | otherwise                             = unspecifiedBody
+      | not canHaveBody                                   = noBody
+      | maybe False (B.isPrefixOf "text/") ct             = textBody
+      | ct == Just "application/json"                     = textBody
+      | maybe False (B.isPrefixOf "application/json;") ct = textBody
+      | maybe False (B.isSuffixOf "+json") ct             = textBody
+      | isJust ct                                         = base64Body
+      | otherwise                                         = unspecifiedBody
       where ct = resContentType
 
 
-    noBody :: IO (Maybe J.Value, Maybe Bool)
+    noBody :: IO (Maybe Text, Maybe Bool)
     noBody = pure (Nothing, Nothing)
 
 
-    textBody :: IO (Maybe J.Value, Maybe Bool)
+    textBody :: IO (Maybe Text, Maybe Bool)
     textBody = do
       bb <- resBodyBytes
-      pure ( (Just . J.String . TE.decodeUtf8 . LB.toStrict) bb
+      pure ( (Just . TE.decodeUtf8 . LB.toStrict) bb
            , Just False
            )
 
 
-    jsonBody :: IO (Maybe J.Value, Maybe Bool)
-    jsonBody = do
-      bb <- resBodyBytes
-      jbb <- either (throwIO . JSONBodyException) pure $ J.eitherDecode bb
-      pure ( Just jbb
-           , Just False
-           )
-
-
-    base64Body :: IO (Maybe J.Value, Maybe Bool)
+    base64Body :: IO (Maybe Text, Maybe Bool)
     base64Body = do
       bb <- base64BodyBytes
-      pure ( Just (J.String bb)
+      pure ( Just bb
            , Just True
            )
 
 
-    unspecifiedBody :: IO (Maybe J.Value, Maybe Bool)
+    unspecifiedBody :: IO (Maybe Text, Maybe Bool)
     unspecifiedBody = do
       bb <- base64BodyBytes
       if T.null bb
       then noBody
-      else pure ( Just (J.String bb)
+      else pure ( Just bb
                 , Just True
                 )
 
