@@ -142,6 +142,7 @@ waiResToGw waiRes = do
     canHaveBody :: Bool -- took from warp's implementation
     canHaveBody
       =  sc /= 204
+      && sc /= 205
       && sc /= 304
       && sc >= 200
       where
