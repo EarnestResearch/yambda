@@ -197,12 +197,11 @@ deriving via EventJSON HTTPRequestContextHTTPDescription
 --   so in general you don't have to wrap everything up into a response type
 --   if that's all you need.
 data HTTPResponse = HTTPResponse
-    { _statusCode        :: Int
-    , _headers           :: Maybe (Map Text Text)
-    , _multiValueHeaders :: Maybe (Map Text [Text])
-    , _body              :: Maybe Text
-    , _isBase64Encoded   :: Maybe Bool
-    , _cookies           :: Maybe [Text]
+    { _statusCode      :: Int
+    , _headers         :: Maybe (Map Text Text)
+    , _body            :: Maybe Text
+    , _isBase64Encoded :: Maybe Bool
+    , _cookies         :: Maybe [Text]
     }
     deriving (Generic, Eq, Show)
 
@@ -210,7 +209,6 @@ httpResponse
   :: Int
   -> HTTPResponse
 httpResponse sc = HTTPResponse sc
-  Nothing
   Nothing
   Nothing
   Nothing

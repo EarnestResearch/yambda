@@ -11,7 +11,6 @@ module AWS.Lambda.Wai.Encoding
   , waiResToGw
   ) where
 
-
 import           AWS.Lambda.Event.APIGatewayV2 hiding (rawQueryString)
 import           Control.Arrow ((***))
 import           Control.Exception
@@ -30,6 +29,7 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import qualified Network.HTTP.Types as H
+import qualified Network.HTTP.Types.Header as H
 import qualified Network.Socket as Sock
 import qualified Network.Wai as W
 import qualified Network.Wai.Internal as W
@@ -50,7 +50,7 @@ gwReqToWai
   -> IO W.Request
 gwReqToWai r@HTTPRequest{..} = do
   remoteHost <- getRemoteHost
-  isFirstRef <- newIORef False
+  isFirstRef <- newIORef True
 
   let  requestBody = do
          isFirst <- atomicModifyIORef' isFirstRef (False,)
@@ -71,13 +71,17 @@ gwReqToWai r@HTTPRequest{..} = do
     requestBodyData :: B.ByteString
     requestBodyData = either (const B.empty) id $ requestBodyBytes r
 
+    pathInfo = maybe
+      (H.decodePathSegments rawPathInfo)
+      (T.split (== '/'))
+      (_pathParameters ^? _Just . ix "proxy")
+
     requestMethod = TE.encodeUtf8 $ _requestContext ^. http . method
     httpVersion = H.http10
     rawPathInfo = TE.encodeUtf8 _rawPath
     rawQueryString = TE.encodeUtf8 _rawQueryString
     requestHeaders = ((CI.mk . TE.encodeUtf8) *** TE.encodeUtf8) <$> Map.toList _headers
     isSecure = _requestContext ^. http . protocol . to (== "https")
-    pathInfo = H.decodePathSegments rawPathInfo
     queryString = H.parseQuery rawQueryString
     vault = mempty
     requestHeaderHost = _requestContext ^. domainName . to (Just . TE.encodeUtf8)
@@ -104,11 +108,10 @@ waiResToGw waiRes = do
 
   pure $ HTTPResponse
     { _statusCode = H.statusCode $ W.responseStatus waiRes
-    , _headers = resHeaders -- TODO: confirm that this works for multi-value headers and cookies
-    , _multiValueHeaders = Nothing -- TODO: confirm that 'headers' is enough
+    , _headers = resHeaders
     , _body = resBody
     , _isBase64Encoded = resBase64
-    , _cookies = Nothing  -- TODO: confirm that 'headers' is enough
+    , _cookies = resCookies
     }
 
   where
@@ -119,15 +122,22 @@ waiResToGw waiRes = do
       = List.lookup H.hContentType
       $ W.responseHeaders waiRes
 
+    (resHeadersCookies, resHeadersNotCookies)
+      = List.partition ((==) H.hSetCookie . fst)
+      $ W.responseHeaders waiRes
+
+    resCookies :: Maybe [Text]
+    resCookies = case resHeadersCookies
+      of [] -> Nothing
+         hs -> Just $ TE.decodeUtf8 . snd <$> hs
 
     resHeaders :: Maybe (Map Text Text)
-    resHeaders = case W.responseHeaders waiRes
+    resHeaders = case resHeadersNotCookies
       of [] -> Nothing
          hs -> Just . Map.fromList $
-               (    TE.decodeUtf8 . CI.original
+               (   TE.decodeUtf8 . CI.original
                *** TE.decodeUtf8
                ) <$> hs
-
 
     canHaveBody :: Bool -- took from warp's implementation
     canHaveBody
