@@ -9,6 +9,5 @@
     "header1": "headerval1",
     "header2": "headerval2"
   },
-  "multiValueHeaders": { "mvheader1": ["mvh1", "mvh2"] },
   "body": "YmFzZTY0dmFs"
 }

@@ -1,0 +1,44 @@
+{
+  "version": "2.0",
+  "routeKey": "ANY /echo/{proxy+}",
+  "rawPath": "/echo/foo/bar/meah",
+  "rawQueryString": "foo=bar,&foo=b,a,z&foo=b,l,a,h",
+  "headers": {
+    "accept": "*/*",
+    "content-length": "43",
+    "content-type": "application/x-www-form-urlencoded",
+    "host": "aabbccddee.execute-api.us-east-1.amazonaws.com",
+    "test": "test1,test2,test3",
+    "user-agent": "curl/7.70.0",
+    "x-amzn-trace-id": "Root=1-5ebed252-c759dc36b13aabe2e3fbeba8",
+    "x-forwarded-for": "33.33.33.33",
+    "x-forwarded-port": "443",
+    "x-forwarded-proto": "https"
+  },
+  "queryStringParameters": {
+    "foo": "bar,,b,a,z,b,l,a,h"
+  },
+  "requestContext": {
+    "accountId": "111111111111",
+    "apiId": "aabbccddee",
+    "domainName": "aabbccddee.execute-api.us-east-1.amazonaws.com",
+    "domainPrefix": "aabbccddee",
+    "http": {
+      "method": "POST",
+      "path": "/echo/foo/bar/meah",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "33.33.33.33",
+      "userAgent": "curl/7.70.0"
+    },
+    "requestId": "MlXM4gtSoAMESgw=",
+    "routeKey": "ANY /echo/{proxy+}",
+    "stage": "$default",
+    "time": "15/May/2020:17:33:06 +0000",
+    "timeEpoch": 1589563986307
+  },
+  "pathParameters": {
+    "proxy": "foo/bar/meah"
+  },
+  "body": "cGFyYW0xPXsiZm9vIjoxLCJiYXIiOiJibGFoIn0mcGFyYW0yPWZvb2Jhcg==",
+  "isBase64Encoded": true
+}

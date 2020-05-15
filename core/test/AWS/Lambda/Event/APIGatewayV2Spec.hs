@@ -9,7 +9,6 @@ module AWS.Lambda.Event.APIGatewayV2Spec where
 import           AWS.Lambda.Event.APIGatewayV2
 import           Control.Lens
 import           Data.Aeson
-import qualified Data.ByteString.Lazy as LB
 import qualified Data.Map.Strict as Map
 import           Data.Text (Text)
 import           GHC.Generics
@@ -41,16 +40,14 @@ spec = describe "JSON decoding" $ do
 testDecodeTextBodyRequestFromFile :: Expectation
 testDecodeTextBodyRequestFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-request-text-body.json"
-  reqBytes <- LB.readFile fname
-  let Just req = decode @HTTPRequest reqBytes
+  Just req <- decodeFileStrict @HTTPRequest fname
   req `shouldBe` mockRequest "Hello from Lambda"
 
 
 testDecodeJsonBodyRequestFromFile :: Expectation
 testDecodeJsonBodyRequestFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-request-json-body.json"
-  reqBytes <- LB.readFile fname
-  let Just req = decode @HTTPRequest reqBytes
+  Just req <- decodeFileStrict @HTTPRequest fname
   req `shouldBe` mockRequest "{\"bodykey1\":\"bodyval\",\"bodykey2\":123}"
   requestBodyJSON @MockBody req `shouldBe` Right (MockBody "bodyval" 123)
 
@@ -58,8 +55,7 @@ testDecodeJsonBodyRequestFromFile = do
 testDecodeBase64BodyRequestFromFile :: Expectation
 testDecodeBase64BodyRequestFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-request-base64-body.json"
-  reqBytes <- LB.readFile fname
-  let Just req = decode @HTTPRequest reqBytes
+  Just req <- decodeFileStrict @HTTPRequest fname
   req `shouldBe` (mockRequest "YmFzZTY0dmFs" & isBase64Encoded .~ True)
   requestBodyText req `shouldBe` Right "base64val"
 
@@ -67,32 +63,28 @@ testDecodeBase64BodyRequestFromFile = do
 testDecodeMinimalRequestFromFile :: Expectation
 testDecodeMinimalRequestFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-request-minimal.json"
-  reqBytes <- LB.readFile fname
-  let Just req = decode @HTTPRequest reqBytes
+  Just req <- decodeFileStrict @HTTPRequest fname
   req `shouldBe` mockMinimalRequest
 
 
 testDecodeTextBodyResponseFromFile :: Expectation
 testDecodeTextBodyResponseFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-response-text-body.json"
-  reqBytes <- LB.readFile fname
-  let Just req = decode @HTTPResponse reqBytes
+  Just req <- decodeFileStrict @HTTPResponse fname
   req `shouldBe` mockResponse "Hello from Lambda!"
 
 
 testDecodeJsonBodyResponseFromFile :: Expectation
 testDecodeJsonBodyResponseFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-response-json-body.json"
-  reqBytes <- LB.readFile fname
-  let Just req = decode @HTTPResponse reqBytes
+  Just req <- decodeFileStrict @HTTPResponse fname
   req `shouldBe` mockResponse "{\"bodykey1\":\"bodyval\",\"bodykey2\":123}"
 
 
 testDecodeBase64BodyResponseFromFile :: Expectation
 testDecodeBase64BodyResponseFromFile = do
   fname <- Paths.getDataFileName "api-gateway-v2-response-base64-body.json"
-  reqBytes <- LB.readFile fname
-  let Just req = decode @HTTPResponse reqBytes
+  Just req <- decodeFileStrict @HTTPResponse fname
   req `shouldBe` (mockResponse "YmFzZTY0dmFs" & isBase64Encoded ?~ True)
 
 
@@ -175,7 +167,6 @@ mockResponse
 mockResponse b = HTTPResponse
   { _statusCode = 200
   , _headers = Just $ Map.fromList [ ("header1", "headerval1"), ("header2", "headerval2") ]
-  , _multiValueHeaders = Just $ Map.fromList [ ("mvheader1", ["mvh1", "mvh2"]) ]
   , _body = Just b
   , _isBase64Encoded = Just False
   , _cookies = Just ["cookie1", "cookie2"]

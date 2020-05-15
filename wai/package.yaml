@@ -33,9 +33,31 @@ dependencies:
 
 library:
   source-dirs: src
+  generated-other-modules:
+    - Paths_aws_lambda_haskell_runtime_client_wai
+
+tests:
+  aws-lambda-haskell-runtime-client-wai-test:
+    main: Spec.hs
+    source-dirs: test
+    generated-other-modules:
+      - Paths_aws_lambda_haskell_runtime_client_wai
+    dependencies:
+      - HUnit >=1.6.0.0 && <1.7
+      - aws-lambda-haskell-runtime-client-wai
+      - hspec >=2.6.1 && <2.8
+    ghc-options:
+      - -threaded
+      - -with-rtsopts=-N
 
 flags:
   static:
     description: Static build
     manual: true
     default: false
+
+data-dir:
+  "data"
+
+data-files:
+  - ! '*.json'

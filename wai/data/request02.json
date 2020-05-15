@@ -1,0 +1,41 @@
+{
+  "version": "2.0",
+  "routeKey": "$default",
+  "rawPath": "/api/foo",
+  "rawQueryString": "foo=bar&bar=baz%20meah",
+  "headers": {
+    "accept": "*/*",
+    "content-length": "35",
+    "content-type": "application/json",
+    "host": "aabbccddee.execute-api.us-east-1.amazonaws.com",
+    "user-agent": "curl/7.70.0",
+    "x-amzn-trace-id": "Root=1-5ebf0749-57baecc80db7e2181f709f90",
+    "x-forwarded-for": "33.33.33.33",
+    "x-forwarded-port": "443",
+    "x-forwarded-proto": "https"
+  },
+  "queryStringParameters": {
+    "bar": "baz meah",
+    "foo": "bar"
+  },
+  "requestContext": {
+    "accountId": "111111111111",
+    "apiId": "aabbccddee",
+    "domainName": "aabbccddee.execute-api.us-east-1.amazonaws.com",
+    "domainPrefix": "aabbccddee",
+    "http": {
+      "method": "PUT",
+      "path": "/api/foo",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "33.33.33.33",
+      "userAgent": "curl/7.70.0"
+    },
+    "requestId": "Ml4TfjMoIAMEMuA=",
+    "routeKey": "$default",
+    "stage": "$default",
+    "time": "15/May/2020:21:19:05 +0000",
+    "timeEpoch": 1589577545415
+  },
+  "body": "{\"username\":\"xyz\",\"password\":\"xyz\"}",
+  "isBase64Encoded": false
+}
