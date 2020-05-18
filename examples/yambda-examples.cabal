@@ -4,15 +4,15 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 72fac088a972f2a73fa68912eff9cd8f15e898e352a9014a506245eb75a28154
+-- hash: 19e6be7d8be56c844be389f1d1df87ba45106efd85cfe97e4e8af7e9cd659a1a
 
-name:           aws-lambda-haskell-runtime-client-examples
+name:           yambda-examples
 version:        0.1.0.0
 synopsis:       AWS Lambda Haskell Runtime Client
-description:    Please see the README on GitHub at <https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme>
+description:    Please see the README on GitHub at <https://github.com/EarnestResearch/yambda#readme>
 category:       AWS
-homepage:       https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme
-bug-reports:    https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client/issues
+homepage:       https://github.com/EarnestResearch/yambda#readme
+bug-reports:    https://github.com/EarnestResearch/yambda/issues
 author:         Louis Vera
 maintainer:     dcq-team@earnestresearch.com
 copyright:      Earnest Research 2019
@@ -22,7 +22,7 @@ build-type:     Simple
 
 source-repository head
   type: git
-  location: https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client
+  location: https://github.com/EarnestResearch/yambda
 
 flag static
   description: Static build
@@ -32,16 +32,16 @@ flag static
 executable api-gateway-exe
   main-is: Main.hs
   other-modules:
-      Paths_aws_lambda_haskell_runtime_client_examples
+      Paths_yambda_examples
   hs-source-dirs:
       api-gateway
   ghc-options: -O2 -rtsopts -threaded -Wall -with-rtsopts=-N
   build-depends:
-      aws-lambda-haskell-runtime-client
-    , base >=4.7 && <5
+      base >=4.7 && <5
     , lens >=4.17.1 && <4.19
     , monad-logger >=0.3.30 && <0.4
     , mtl >=2.2.2 && <2.3
+    , yambda
   if flag(static)
     cc-options: -static
     ld-options: -static -pthread
@@ -50,17 +50,17 @@ executable api-gateway-exe
 executable dhall-exe
   main-is: Main.hs
   other-modules:
-      Paths_aws_lambda_haskell_runtime_client_examples
+      Paths_yambda_examples
   hs-source-dirs:
       dhall
   ghc-options: -O2 -rtsopts -threaded -Wall -with-rtsopts=-N
   build-depends:
-      aws-lambda-haskell-runtime-client
-    , base >=4.7 && <5
+      base >=4.7 && <5
     , dhall >=1.26.1 && <1.31
     , lens >=4.17.1 && <4.19
     , monad-logger >=0.3.30 && <0.4
     , mtl >=2.2.2 && <2.3
+    , yambda
   if flag(static)
     cc-options: -static
     ld-options: -static -pthread
@@ -69,16 +69,16 @@ executable dhall-exe
 executable kinesis-exe
   main-is: Main.hs
   other-modules:
-      Paths_aws_lambda_haskell_runtime_client_examples
+      Paths_yambda_examples
   hs-source-dirs:
       kinesis
   ghc-options: -O2 -rtsopts -threaded -Wall -with-rtsopts=-N
   build-depends:
-      aws-lambda-haskell-runtime-client
-    , base >=4.7 && <5
+      base >=4.7 && <5
     , lens >=4.17.1 && <4.19
     , monad-logger >=0.3.30 && <0.4
     , mtl >=2.2.2 && <2.3
+    , yambda
   if flag(static)
     cc-options: -static
     ld-options: -static -pthread
@@ -87,16 +87,16 @@ executable kinesis-exe
 executable s3-exe
   main-is: Main.hs
   other-modules:
-      Paths_aws_lambda_haskell_runtime_client_examples
+      Paths_yambda_examples
   hs-source-dirs:
       s3
   ghc-options: -O2 -rtsopts -threaded -Wall -with-rtsopts=-N
   build-depends:
-      aws-lambda-haskell-runtime-client
-    , base >=4.7 && <5
+      base >=4.7 && <5
     , lens >=4.17.1 && <4.19
     , monad-logger >=0.3.30 && <0.4
     , mtl >=2.2.2 && <2.3
+    , yambda
   if flag(static)
     cc-options: -static
     ld-options: -static -pthread
@@ -105,16 +105,16 @@ executable s3-exe
 executable sns-exe
   main-is: Main.hs
   other-modules:
-      Paths_aws_lambda_haskell_runtime_client_examples
+      Paths_yambda_examples
   hs-source-dirs:
       sns
   ghc-options: -O2 -rtsopts -threaded -Wall -with-rtsopts=-N
   build-depends:
-      aws-lambda-haskell-runtime-client
-    , base >=4.7 && <5
+      base >=4.7 && <5
     , lens >=4.17.1 && <4.19
     , monad-logger >=0.3.30 && <0.4
     , mtl >=2.2.2 && <2.3
+    , yambda
   if flag(static)
     cc-options: -static
     ld-options: -static -pthread
@@ -123,14 +123,12 @@ executable sns-exe
 executable wai-exe
   main-is: Main.hs
   other-modules:
-      Paths_aws_lambda_haskell_runtime_client_examples
+      Paths_yambda_examples
   hs-source-dirs:
       wai
   ghc-options: -O2 -rtsopts -threaded -Wall -with-rtsopts=-N
   build-depends:
       aeson >1.4
-    , aws-lambda-haskell-runtime-client
-    , aws-lambda-haskell-runtime-client-wai
     , base >=4.7 && <5
     , lens >=4.17.1 && <4.19
     , monad-logger >=0.3.30 && <0.4
@@ -139,6 +137,8 @@ executable wai-exe
     , servant-server >0.16
     , text >1.2
     , wai >3.2
+    , yambda
+    , yambda-wai
   if flag(static)
     cc-options: -static
     ld-options: -static -pthread

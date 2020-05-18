@@ -1,13 +1,13 @@
-name: aws-lambda-haskell-runtime-client-examples
+name: yambda-examples
 version: '0.1.0.0'
 synopsis: AWS Lambda Haskell Runtime Client
-description: Please see the README on GitHub at <https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme>
+description: Please see the README on GitHub at <https://github.com/EarnestResearch/yambda#readme>
 category: AWS
 author: Louis Vera
 maintainer: dcq-team@earnestresearch.com
 copyright: Earnest Research 2019
 license: MIT
-github: EarnestResearch/aws-lambda-haskell-runtime-client
+github: EarnestResearch/yambda
 
 ghc-options:
 - -O2
@@ -17,7 +17,7 @@ ghc-options:
 - -with-rtsopts=-N
 
 dependencies:
-- aws-lambda-haskell-runtime-client
+- yambda
 - base >=4.7 && <5
 - lens >=4.17.1 && <4.19
 - monad-logger >=0.3.30 && <0.4
@@ -80,7 +80,7 @@ executables:
     main: Main.hs
     source-dirs: wai
     dependencies:
-      - aws-lambda-haskell-runtime-client-wai
+      - yambda-wai
       - aeson >1.4
       - servant >0.16
       - servant-server >0.16

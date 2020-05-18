@@ -6,7 +6,7 @@ module AWS.Lambda.Event.KinesisSpec where
 import           AWS.Lambda.Event.Kinesis
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as LB
-import qualified Paths_aws_lambda_haskell_runtime_client as Paths
+import qualified Paths_yambda as Paths
 import           Test.Hspec
 
 

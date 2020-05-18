@@ -1,3 +1,3 @@
-# Changelog for aws-lambda-haskell-runtime-client
+# Changelog for yambda
 
 ## Unreleased changes

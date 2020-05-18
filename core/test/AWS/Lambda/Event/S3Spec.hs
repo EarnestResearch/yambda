@@ -8,7 +8,7 @@ import           AWS.Lambda.Event.S3
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.HashMap.Strict as Map
-import qualified Paths_aws_lambda_haskell_runtime_client as Paths
+import qualified Paths_yambda as Paths
 import           Test.Hspec
 
 

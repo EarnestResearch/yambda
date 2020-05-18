@@ -11,7 +11,7 @@ import qualified Data.List as List
 import qualified Data.Map.Strict as Map
 import qualified Network.HTTP.Types as H
 import qualified Network.Wai as W
-import qualified Paths_aws_lambda_haskell_runtime_client_wai as Paths
+import qualified Paths_yambda_wai as Paths
 import           Test.Hspec
 
 

@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/EarnestResearch/aws-lambda-haskell-runtime-client.svg?branch=master)](https://travis-ci.org/EarnestResearch/aws-lambda-haskell-runtime-client)
+[![Build Status](https://travis-ci.org/EarnestResearch/yambda.svg?branch=master)](https://travis-ci.org/EarnestResearch/yambda)
 
-# aws-lambda-haskell-runtime-client
+# yambda
 
 A custom runtime client for AWS Lamda written in Haskell.
 
@@ -9,7 +9,7 @@ Examples of how to use this client can be found in the `examples` directory.
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
-- [aws-lambda-haskell-runtime-client](#aws-lambda-haskell-runtime-client)
+- [yambda](#yambda)
     - [Creating a lambda based on this library](#creating-a-lambda-based-on-this-library)
     - [Deriving encoders and decoders](#deriving-encoders-and-decoders)
     - [Contributing](#contributing)
@@ -29,7 +29,7 @@ To create a lambda that is based on this library, using `stack`:
 1. Add this repository to your extra-deps
 ```yaml
 extra-deps:
-  - github: EarnestResearch/aws-lambda-haskell-runtime-client
+  - github: EarnestResearch/yambda
     commit: {commit-sha}
 ```
 2. Add it to your `package.yaml`
@@ -126,7 +126,7 @@ See [Encoding.hs](src/AWS/Lambda/Encoding.hs) for some examples of encoders and 
 ### Building
 
 The default make target will compile and test the executables defined in
-`aws-lambda-haskell-runtime-client.cabal`. You can find the produced artifacts in the `build` directory.
+`yambda.cabal`. You can find the produced artifacts in the `build` directory.
 
 ```
 make
@@ -157,7 +157,7 @@ To add a new usage example:
 1. Add a SAM template that defines the resources needed by your lambda function
    in your new directory. It should be named `template.yaml`. Use `CodeUri:
 '{{ZIP_FILE_PATH}}'` for the code URI attribute.
-1. Define a new executable in `aws-lambda-haskell-runtime-client.cabal`. Use the name of your directory as the executable name.
+1. Define a new executable in `yambda.cabal`. Use the name of your directory as the executable name.
 1. Add the directory name to the `EXAMPLES` variable in the `Makefile`.
 1. Run `make` to verify there are no errors.
 

@@ -1,13 +1,13 @@
-name: aws-lambda-haskell-runtime-client-wai
+name: yambda-wai
 version: '0.1.0.0'
 synopsis: AWS Lambda Haskell Runtime Client' WAI bindings
-description: Please see the README on GitHub at <https://github.com/EarnestResearch/aws-lambda-haskell-runtime-client#readme>
+description: Please see the README on GitHub at <https://github.com/EarnestResearch/yambda#readme>
 category: AWS
 author: Earnest research team
 maintainer: dcq-team@earnestresearch.com
 copyright: Earnest Research 2019
 license: MIT
-github: EarnestResearch/aws-lambda-haskell-runtime-client
+github: EarnestResearch/yambda
 
 extra-source-files:
 - README.md
@@ -15,7 +15,7 @@ extra-source-files:
 
 dependencies:
 - aeson >=1.4.2 && <1.5
-- aws-lambda-haskell-runtime-client
+- yambda
 - base >=4.7 && <5
 - base64 >0.4
 - bytestring >=0.10.8 && <0.11
@@ -34,17 +34,17 @@ dependencies:
 library:
   source-dirs: src
   generated-other-modules:
-    - Paths_aws_lambda_haskell_runtime_client_wai
+    - Paths_yambda_wai
 
 tests:
-  aws-lambda-haskell-runtime-client-wai-test:
+  yambda-wai-test:
     main: Spec.hs
     source-dirs: test
     generated-other-modules:
-      - Paths_aws_lambda_haskell_runtime_client_wai
+      - Paths_yambda_wai
     dependencies:
       - HUnit >=1.6.0.0 && <1.7
-      - aws-lambda-haskell-runtime-client-wai
+      - yambda-wai
       - hspec >=2.6.1 && <2.8
     ghc-options:
       - -threaded

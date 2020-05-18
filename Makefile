@@ -7,7 +7,7 @@ build: ## compile and test
 
 .PHONY: dev
 dev: ## automatically compile and test when a file is written
-	stack build --test --file-watch
+	stack build --fast --test --file-watch
 
 .PHONY: clean
 clean: ## remove all cached files
@@ -55,12 +55,12 @@ sam-template:
 deploy: upload ## deploy lambda to AWS using SAM CLI
 	sam deploy \
 		--template-file ${BUILD_DIR}/${NAME}-S3.yaml \
-		--stack-name aws-lambda-haskell-runtime-${NAME} \
+		--stack-name yambda-${NAME} \
 		--capabilities CAPABILITY_IAM
 
 .PHONY: linted
 linted: ## run linter
-	hlint "--ignore=Parse error" examples src test
+	hlint -j --git
 
 .PHONY: stylish
 stylish: ## run stylish haskell code formatter
