@@ -39,6 +39,7 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 import qualified Data.Text.Encoding.Base64 as TB64
+import           Data.Word
 import           GHC.Generics
 
 
@@ -130,7 +131,7 @@ data HTTPRequestContext = HTTPRequestContext
     , _domainName   :: Text
     , _domainPrefix :: Text
     , _time         :: Text
-    , _timeEpoch    :: Int
+    , _timeEpoch    :: Word64
     , _http         :: HTTPRequestContextHTTPDescription
     }
     deriving (Generic, Eq, Show)
