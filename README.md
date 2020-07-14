@@ -31,6 +31,9 @@ To create a lambda that is based on this library, using `stack`:
 extra-deps:
   - github: EarnestResearch/yambda
     commit: {commit-sha}
+    subdirs:
+      - core
+      - wai
 ```
 2. Add it to your `package.yaml`
 
